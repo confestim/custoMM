@@ -2,10 +2,6 @@ from lcu_driver import Connector
 import requests
 # Create config.py when running for the first time
 import config
-from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.button import Button
-from kivy.core.window import Window
 
 
 # Init connection
@@ -17,7 +13,7 @@ def parse_history(history:dict, old_ids:list) -> list:
     # Output: ID's of custom games, ready to send to server
     
     # Get the entirety of the current champs and their ids
-
+    new_games = []
     for i in history["games"]["games"]:
        if i["gameType"] == "CUSTOM_GAME" and i["gameId"] not in old_ids:
            new_games.append(i)
@@ -54,29 +50,8 @@ async def connect(connection):
 @connector.close
 async def disconnect(connection):
     print('Finished task')
+    
+# Begin
+connector.start()
 
 
-Window.size = (300, 200)
-
-
-class MainWindow(BoxLayout):
-    def __init__(self):
-        super().__init__()
-        self.button = Button(text="Hello, World?")
-        self.button.bind(on_press=self.handle_button_clicked)
-
-        self.add_widget(self.button)
-
-    def handle_button_clicked(self, event):
-        self.button.text = "loading..."
-        connector.start()
-
-
-class MyApp(App):
-    def build(self):
-        self.title = "Hello, World!"
-        return MainWindow()
-
-
-app = MyApp()
-app.run()
