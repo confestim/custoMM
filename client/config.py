@@ -1,1 +1,0 @@
-SERVER_URL = "https://your-site.com"
