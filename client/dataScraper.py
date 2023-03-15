@@ -45,6 +45,7 @@ async def connect(connection):
     
     # PLACEHOLDER
     # TODO: Do communication b/n client and server which provides IDs of already cached games in a list 
+    requests.get(config.SITE_URL)
     old_ids = [] 
     games = parse_history(match_history, old_ids)
     
