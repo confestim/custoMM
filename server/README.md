@@ -7,4 +7,4 @@ To install, do:
 1. `python manage.py runserver`
 
 
-If you want to run this server in a more **secure** environment<sub>which is heavily recommended</sub>, please check out [gunicorn](https://gunicorn.org/).
+If you want to run this server in a more **secure** environment <sub>which is heavily recommended</sub> , please check out [gunicorn](https://gunicorn.org/).
