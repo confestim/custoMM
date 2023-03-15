@@ -1,1 +1,1 @@
-SERVER_URL = "https://your-server.com"
+SERVER_URL = "https://customs.confest.im"
