@@ -1,12 +1,15 @@
 # custoMM
 <p align="center">
 <img src="images/logo.png"/>
-</p>
+</p>  
+
+  
 ## What is this?
 This is a project inspired by a heavy loss while playing customs in league of legends. The idea is to create fair teams, without taking rank into account(cuz that's boring and we're antiestablishment 🗿♿🥶).
 
 
 ## Mechanism
+  
 ![Mechanism](images/Mechanism.png)
 
 ## Registration
@@ -16,6 +19,7 @@ A user registers like so:
   3. The client prompts the user if they really want to proceed, showing the discord username which initiated the registration. When a username is registered, it cannot be registered again(do not worry, even if you change your name in either LoL or Discord you will still be registered). You can still lend out your account, however, using the [guest mode](#guest-mode).
    
 Here's a flowchart explaining the technical stuff about this process:  
+  
 ![Registration](images/Registration.png)
 
 ## Guest mode
