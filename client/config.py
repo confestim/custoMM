@@ -1,1 +1,1 @@
-SERVER_URL = "https://your-site.com"
+SERVER_URL = "https://lolcustoms.confest.im"
