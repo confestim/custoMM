@@ -1,11 +1,12 @@
 from lcu_driver import Connector
 import requests
-# please do check out config.py
+# Create config.py when running for the first time
 import config
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.button import Button
+from kivy.core.window import Window
 
-
-# Change this when new champ(Rito are fucking stupid)
-VERSION = "13.5.1"
 
 # Init connection
 connector = Connector()
@@ -16,10 +17,7 @@ def parse_history(history:dict, old_ids:list) -> list:
     # Output: ID's of custom games, ready to send to server
     
     # Get the entirety of the current champs and their ids
-    
-    champs = requests.get(f"http://ddragon.leagueoflegends.com/cdn/{VERSION}/data/en_US/champion.json").json()["data"]
-    new_games = []
-    # TODO: Host a champs dict in the form of {ID: NAME}
+
     for i in history["games"]["games"]:
        if i["gameType"] == "CUSTOM_GAME" and i["gameId"] not in old_ids:
            new_games.append(i)
@@ -45,6 +43,7 @@ async def connect(connection):
     
     # PLACEHOLDER
     # TODO: Do communication b/n client and server which provides IDs of already cached games in a list 
+    requests.get(config.SITE_URL)
     old_ids = [] 
     games = parse_history(match_history, old_ids)
     
@@ -57,10 +56,27 @@ async def disconnect(connection):
     print('Finished task')
 
 
-
-    
-   
-    
+Window.size = (300, 200)
 
 
-connector.start()
+class MainWindow(BoxLayout):
+    def __init__(self):
+        super().__init__()
+        self.button = Button(text="Hello, World?")
+        self.button.bind(on_press=self.handle_button_clicked)
+
+        self.add_widget(self.button)
+
+    def handle_button_clicked(self, event):
+        self.button.text = "loading..."
+        connector.start()
+
+
+class MyApp(App):
+    def build(self):
+        self.title = "Hello, World!"
+        return MainWindow()
+
+
+app = MyApp()
+app.run()
