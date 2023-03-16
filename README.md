@@ -5,7 +5,7 @@
 
   
 ## What is this?
-This is a project inspired by a heavy loss while playing customs in league of legends. The idea is to create fair teams, without taking rank into account(cuz that's boring and we're antiestablishment 🗿♿🥶).
+This is a project inspired by a heavy loss while playing customs in league of legends. The idea is to create fair teams, without taking rank into account(cuz that's boring and we're antiestablishmentarians 🗿♿🥶).
 
 
 ## Mechanism
