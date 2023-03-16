@@ -44,6 +44,9 @@ async def parse_history(connection, history:dict, old_ids:list) -> list:
   
             match = await connection.request('get', f'/lol-match-history/v1/games/{i["gameId"]}')
             matches.append(await match.json())
+    if not ids:
+        print("Already up to date, thanks.")
+        sys.exit()
     return matches
     
     # TODO: Format this list in the form of [{gid: GAME-ID, puuid:puuid}]
