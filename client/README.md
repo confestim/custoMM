@@ -20,6 +20,5 @@ Check out the releases for pre-compiled binaries of the client and server.
 1. [ ] Make the server and client talk to each other
     * [ ] Based on MMR
     * [ ] Based on cached IDs
-2. [ ] Decide if we want a website bundled into electron or a standalone app
 
 

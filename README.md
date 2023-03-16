@@ -12,6 +12,8 @@ This is a project inspired by a heavy loss while playing customs in league of le
   
 ![Mechanism](images/Mechanism.png)
 
+CORRECTION, the client will be just a simple exe file that one runs once they want/finish a game. Lol.
+
 ## Registration
 A user registers like so:
   1. Opens the client of custoMM
