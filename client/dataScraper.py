@@ -82,9 +82,11 @@ async def connect(connection):
             prompt = input(f"{claimed['discord']} is trying to claim this account(which you obviously own). Do you want to do that? [y/N]  ")
             if prompt == ("y" or "Y"):
             # TODO: Update api entry
+                requests.put(config.SITE_URL + f"players/{claimed['discord_id']}", data={"lol": summoner["displayName"], "lol_id": summoner["puuid"]})
                 print(f"Alright, the account is now yours, {claimed['discord']}.")
             else:
             #TODO: Delete api entry
+                requests.delete(config.SITE_URL + f"players/{claimed['discord_id']}")
                 print("Okay, deleting the attempt.")
                 sys.exit()
         
