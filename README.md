@@ -27,4 +27,3 @@ Here's a flowchart explaining the technical stuff about this process:
 ## Guest mode
 If you want to use somebody else's account while playing customs, you can temporarily claim it, which will make the actual owner not gain MMR from the current game. That's about it. You, as the temporary player, do receive some MMR, however it is reduced by 50%, bc god damn get your own account wtf.
 
-
