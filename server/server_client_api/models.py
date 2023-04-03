@@ -1,7 +1,7 @@
 from django.db import models
 
 class Player(models.Model):
-    discord = models.CharField(max_length=60, unique=True)
+    discord = models.CharField(max_length=60, unique=True, null=True)
     lol = models.CharField(max_length=60, null=True, blank=True,unique=True )
     lol_id = models.CharField(max_length=60, null=True, blank=True , unique=True)
     discord_id = models.IntegerField(primary_key=True, unique=True)

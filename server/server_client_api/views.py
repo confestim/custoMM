@@ -2,6 +2,7 @@ from rest_framework import viewsets, filters, mixins
 from rest_framework.response import Response
 from .serializers import PlayerSerializer, GameSerializer
 from .models import Player, Game
+import random
 
 import math
 from rest_framework import status
@@ -43,15 +44,14 @@ def games(request):
         return Response(serializer.data)
 
     if request.method == 'POST':
-        try: 
-            game, created = Game.get_or_create(game_id=request.data["game_id"])
+        
+            print(request.data["game_id"])
+            game, created = Game.objects.get_or_create(game_id=int(request.data.get("game_id")))
             if not created:
-                return Response("Game already exists.", status=HTTP_409_CONFLICT)
+                return Response("Game already exists.", status=status.HTTP_409_CONFLICT)
             parse_game(request.data)
-            return Response("Added.", status=HTTP_201_CREATED)
-        except Exception as error:
-            return Response(error, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response("Added.", status=status.HTTP_201_CREATED)
+       
 
 
 def mmr_on_game(ign:str, avg_enemy_mmr:int, kda:float, outcome:bool):
@@ -82,6 +82,7 @@ def mmr_on_game(ign:str, avg_enemy_mmr:int, kda:float, outcome:bool):
         
     # Save to player
     player.mmr = mmr_change
+    player.games_played += 1
     player.save()
 
     # TODO REMOVE DEBUG
@@ -97,20 +98,28 @@ def average_mmr(game):
     
     winners = list()
     losers = list()
+    player_count = 1
     
-    for i in outcome:
-        for i in teams[i]["summoners"]:
-            
-            player, created = Player.get_or_create(lol=game["participants"][outcome[0]]["summoners"]["name"])
-            
-            if len(winners) < 5:
+    for team in outcome:
+        for user in teams[team]["summoners"]:
+            print(user["name"])
+            try:
+                player = Player.objects.get(lol=user["name"])
+            except Player.DoesNotExist:
+                # Absolutely filthy line of code, fix this ASAP
+                player = Player.objects.create(lol=user["name"], discord = random.randint(0,1000000), discord_id = random.randint(0,1000000))
+                print(f"{player.lol} has just been created.")
+           
+            if len(winners) <= 5:
                 winners.append(player.mmr)
             
             else:
                 losers.append(player.mmr)
             
-            if not created:
-                print(f"{player.lol} has just been created.")
+  
+
+   
+            player_count += 1
 
     return sum(winners)/5, sum(losers)/5
     
@@ -119,12 +128,22 @@ def parse_game(game):
     teams = game["participants"]
     winner, loser = average_mmr(game)
     
-    for team in teams:
-        average = loser if team["won"] else winner 
-        win_loss = True if team["won"] else False
-        # ign:str, avg_enemy_mmr:int, kda:float, outcome:bool
-        for player in team["summoners"]:
-            mmr_on_game(player["name"], average, player["kda"], win_loss)
+    average = winner if teams["t1"]["won"] else loser 
+    win_loss = True if teams["t1"]["won"] else False
+    # ign:str, avg_enemy_mmr:int, kda:float, outcome:bool
+        
+    # get rid of the 2 loops, merge them into one
+    for player in teams["t1"]["summoners"]:
+        print(player)
+        mmr_on_game(player["name"], average, player["kda"], win_loss)
+    
+    
+    win_loss = not win_loss
+    average = winner if win_loss else loser
+    
+    for player in teams["t2"]["summoners"]:
+        print(player)
+        mmr_on_game(player["name"], average, player["kda"], win_loss)
     
     return print("Done with changing mmr") 
     
