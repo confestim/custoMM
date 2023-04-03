@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Player
+from .models import Player, Game
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
@@ -13,3 +13,10 @@ class PlayerSerializer(serializers.HyperlinkedModelSerializer):
         instance.lol_id = validated_data.get('lol_id', instance.lol_id)
         instance.save()
         return instance
+
+class GameSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Game
+        fields = ("game_id",)
+

@@ -35,15 +35,50 @@ async def parse_history(connection, history:dict, old_ids:list) -> list:
     # Parses current player's history
     # Input: Logged in player's match history
     # Output: New data about unaccounted for custom games, ready to send to server
-    
-    # Get the entirety of the current champs and their ids
+    """
+    {
+    "game_id": "12345",
+    "participants": {
+        "t1": {
+        "won":true,
+        "summoners": [
+            {
+            "name": "summoner",
+            "kda": 0.333,
+            },
+        ]
+        }
+        },
+        "t2": {
+        "won":false,
+        "summoners": {
+            ...
+        }
+        }
+    }
+    }
+    """
     matches = []
     ids = [] 
     for i in history["games"]["games"]:
        if i["gameType"] == "CUSTOM_GAME" and i["gameId"] not in old_ids:
   
             match = await connection.request('get', f'/lol-match-history/v1/games/{i["gameId"]}')
-            matches.append(await match.json())
+            match = await match.json()
+            match = {
+                        "game_id": match["metadata"]["matchId"],
+                        "participants": {
+                            "t1": {
+                                "won": match["teams"][0]["win"],
+                                "summoners": [{"name":x["summonerName"], "kda":int(x["kda"])} if x["teamId"] == match["teams"][0]["teamID"] for x in match["info"]["participants"]]
+                            }
+                            "t2": {
+                                "won": match["teams"][1]["win"],
+                                "summoners": [{"name":x["summonerName"], "kda":int(x["kda"])} if x["teamId"] == match["teams"][1]["teamID"] for x in match["info"]["participants"]]
+                            }
+                        }
+            }
+            matches.append(match)
     if not ids:
         print("Already up to date, thanks.")
         sys.exit()
@@ -109,25 +144,17 @@ async def connect(connection):
     match_history = await connection.request('get', '/lol-match-history/v1/products/lol/current-summoner/matches?endIndex=99')
     match_history = await match_history.json()
   
-    
-    # PLACEHOLDER
-    # TODO: Do communication b/n client and server which provides IDs of already cached games in a list 
-    requests.get(config.SITE_URL)
-    old_ids = []  
+    # Stage old ids in order for them to be parsed
+    old_ids = requests.get(config.SITE_URL + "/games/").json()
+    old_ids = [x["game_id"] for x in old_ids]
+
+    # TODO: Optimize the process of acquisition of new matches 
     games = await parse_history(connection, match_history, old_ids)
-    
-    
-        
-    print("We have added " + str(len(games)) + " games that were unaccounted for to the db.")
-    
-    # TODO: Create a separate table with the game info
-    # Also find what we need from each game (or in other words, figure out the algo by which we will calculate MMR)
-    
-    
+            
     # Post the new games to your server(change in config.py)
-    #for i in games:
-        # TODO: finish this post request
-      ##  requests.post(config.SITE_URL + "games/", data={"id": i["gameId"] )
+    for i in games:
+        requests.post(config.SITE_URL + "games/", data=i)
+    print("We have added " + str(len(games)) + " games that were unaccounted for to the db.")
     
 @connector.close
 async def disconnect(connection):
