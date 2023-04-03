@@ -63,7 +63,10 @@ async def connect(connection):
     # Check if account is claimed
     try:
         claimed = requests.get(config.SITE_URL+ f"players/?search={summoner['displayName']}").json()[0]
-    except KeyError:
+    except Exception as e:
+        if e == "IndexError":
+            print("User does not exist")
+            pass
         print("Maybe open up your League client?")
         sys.exit()
     
@@ -82,8 +85,17 @@ async def connect(connection):
             prompt = input(f"{claimed['discord']} is trying to claim this account(which you obviously own). Do you want to do that? [y/N]  ")
             if prompt == ("y" or "Y"):
             # TODO: Update api entry
-                requests.put(config.SITE_URL + f"players/{claimed['discord_id']}", data={"lol": summoner["displayName"], "lol_id": summoner["puuid"]})
-                print(f"Alright, the account is now yours, {claimed['discord']}.")
+                account = requests.put(config.SITE_URL + f"players/{claimed['discord_id']}/", data={
+                "lol": summoner["displayName"],
+                "lol_id": summoner["puuid"], 
+                "discord_id":claimed["discord_id"],
+                "discord":claimed["discord"]
+                })
+                print(account.content)
+                if account.status_code == 200:
+                    print(f"Alright, the account is now yours, {claimed['discord']}.")
+                else:
+                    print("Something went wrong when claiming your account...")
             else:
             #TODO: Delete api entry
                 requests.delete(config.SITE_URL + f"players/{claimed['discord_id']}")
