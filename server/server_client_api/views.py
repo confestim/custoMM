@@ -16,7 +16,7 @@ class WhatTheFuckDidYouDo(Exception):
         super().__init__(self.message)
 
 class PlayerViewSet(viewsets.ModelViewSet):
-    search_fields = ['discord','lol']
+    search_fields = ['discord_id','lol']
     filter_backends = (filters.SearchFilter,)
     queryset = Player.objects.all().order_by('mmr')
     serializer_class = PlayerSerializer
@@ -51,8 +51,62 @@ def games(request):
                 return Response("Game already exists.", status=status.HTTP_409_CONFLICT)
             parse_game(request.data)
             return Response("Added.", status=status.HTTP_201_CREATED)
-       
 
+@api_view(['GET'])
+def game(request):
+    player_ids = request.data.get("players")
+    players = list()
+    for player in player_ids:
+        # This doesn't support multiple accounts for each user, refer to issue #8
+        p = Player.objects.get(lol=player)
+        players.append({"lol": p.lol, "discord_id":p.discord_id, "mmr":p.mmr})
+
+    
+    players.sort(key=lambda x: x['mmr'], reverse=True)
+
+
+    # Sort the list of players based on their mmr values
+    players.sort(key=lambda x: x['mmr'], reverse=True)
+
+    # Initialize the two groups as empty lists
+    group1 = []
+    group2 = []
+
+    # Add players to each group, alternating between the two groups
+    for i, player in enumerate(players):
+        if i % 2 == 0:
+            group1.append(player)
+        else:
+            group2.append(player)
+
+    # Calculate the total mmr of each group
+    group1_total = sum(player['mmr'] for player in group1)
+    group2_total = sum(player['mmr'] for player in group2)
+
+    # While the difference between the total mmr of the two groups is greater than 100, move a player from the group with the higher total mmr to the group with the lower total mmr
+    while abs(group1_total - group2_total) > 200:
+        if group1_total > group2_total:
+            # Remove a player from group 1 and add them to group 2
+            player = group1.pop(0)
+            group2.append(player)
+
+            # Update the total mmr of each group
+            group1_total -= player['mmr']
+            group2_total += player['mmr']
+        else:
+            # Remove a player from group 2 and add them to group 1
+            player = group2.pop(0)
+            group1.append(player)
+
+            # Update the total mmr of each group
+            group2_total -= player['mmr']
+            group1_total += player['mmr']
+
+    # Create two teams of five players each
+    team1 = group1[::2] + group2[1::2]
+    team2 = group2[::2] + group1[1::2]
+
+    return Response({team1, team2})
 
 def mmr_on_game(ign:str, avg_enemy_mmr:int, kda:float, outcome:bool):
     
