@@ -106,8 +106,7 @@ def average_mmr(game):
             try:
                 player = Player.objects.get(lol=user["name"])
             except Player.DoesNotExist:
-                # Absolutely filthy line of code, fix this ASAP
-                player = Player.objects.create(lol=user["name"], discord = random.randint(0,1000000), discord_id = random.randint(0,1000000))
+                player = Player.objects.create(lol=user["name"])
                 print(f"{player.lol} has just been created.")
            
             if len(winners) <= 5:
