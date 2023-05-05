@@ -111,7 +111,7 @@ async def connect(connection):
        
     # Check if account is claimed
     try:
-        claimed = requests.get(URL+ f"players/?search={summoner['displayName']}").json()[0]
+        claimed = requests.get(f"{URL}/players/?search={summoner['displayName']}").json()[0]
     except IndexError:
         
         print("User does not exist, register through discord please.")
