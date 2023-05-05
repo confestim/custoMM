@@ -157,7 +157,17 @@ async def register(ctx, *args):
     name = " ".join(args)
     print(name)
     league_name = requests.get(f"{URL}/players/{name}").json()
+<<<<<<< HEAD
     print(league_name)
+=======
+
+    try:
+        if not league_name["detail"] == "Not found.":
+            return await ctx.send("Someone already claimed this account")
+    except KeyError:
+        if league_name["discord_id"]:
+            return await ctx.send(f"{league_name['discord']} has claimed this account.")
+>>>>>>> 724a78ec70c1093baf80abc93712303e1291cc94
 
     claim_account = requests.post(f"{URL}/players/", data={
         "discord": ctx.author.name,

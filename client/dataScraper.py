@@ -56,12 +56,12 @@ async def parse_history(connection, history:dict, old_ids:list) -> list:
     parsed_matches = []
     new = 0
     for i in history["games"]["games"]:
-       if i["gameType"] == "CUSTOM_GAME" and str(i["gameId"]) not in old_ids:
+       if i["gameType"] == "CUSTOM_GAME" and str(i["gameId"]) not in old_ids and not i["gameMode"] == "PRACTICETOOL":
             
             new += 1
             match = await connection.request('get', f'/lol-match-history/v1/games/{i["gameId"]}')
             match = await match.json()
-            #print(match)
+            print(match)
             parsed_match = {
                         "game_id": match["gameId"],
                         "participants": {
@@ -89,7 +89,8 @@ async def parse_history(connection, history:dict, old_ids:list) -> list:
                     parsed_match["participants"]["t2"]["summoners"].append({"name":match["participantIdentities"][player]["player"]["summonerName"], "kda": calculate_kda(kills, assists, deaths)})
             parsed_matches.append(parsed_match)
     if not new:
-        print("Already up to date, thanks.")
+        print("Already up to date, thanks. Program will now close.")
+        time.sleep(3)
         sys.exit()
     return parsed_matches
     
@@ -114,12 +115,25 @@ async def connect(connection):
     except IndexError:
         
         print("User does not exist, register through discord please.")
+        print("Program will now close")
+        time.sleep(5)
         sys.exit()
-    
+    # Case 3: It belongs to nobody and has yet to be claimed.
+    if not claimed["discord"]:
+        print("This account has not yet been claimed. Please claim it (if its yours) by typing in !claim ACCOUNTNAME to the bot in Discord and running this program again.")
+        print(claimed)
+        for i in range(10):
+            time.sleep(.5)
+            sys.stdout.write(".")
+            sys.stdout.flush()
+            
+        sys.exit()
+        
     if claimed:
         # Case 1: It belongs to somebody
         if claimed['lol_id'] and claimed['lol']:
             print(f"Welcome, {claimed['discord']}. Thank you for contributing to custoMM!")
+            print(claimed)
             print("If this is not you, contact admin.")
             
             # Notify them (if that is the case) that we will do nothing about their new name (slight TODO).
@@ -137,7 +151,6 @@ async def connect(connection):
                 "discord_id":claimed["discord_id"],
                 "discord":claimed["discord"]
                 })
-                print(account.content)
                 if account.status_code == 200:
                     print(f"Alright, the account is now yours, {claimed['discord']}.")
                 else:
@@ -151,16 +164,9 @@ async def connect(connection):
         # All cases are covered, everything else will be considered a bug.
         else:
             raise WhatTheFuckDidYouDo()
-    
-    # Case 3: It belongs to nobody and has yet to be claimed.
-    else:
-        print("This account has not yet been claimed. Please claim it (if its yours) by typing in !claim ACCOUNTNAME to the bot in Discord and running this program again.")
-        for i in range(10):
-            time.sleep(.5)
-            sys.stdout.write(".")
-            sys.stdout.flush()
-            
-        sys.exit()
+        
+        time.sleep(5)
+
             
     
     # Match History
@@ -188,6 +194,7 @@ async def connect(connection):
 async def disconnect(connection):
     """Disconnects from the league client"""
     print('Harvesting is over!')
+    time.sleep(5)
     
 # Begin
 
