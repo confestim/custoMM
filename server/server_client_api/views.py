@@ -54,8 +54,12 @@ def games(request):
 
 @api_view(['GET'])
 def game(request):
+<<<<<<< HEAD
     player_ids = request.GET.getlist("players")
     print(player_ids)
+=======
+    player_ids = request.data.getlist("players")
+>>>>>>> 024636e07fcc60db1947c5776279e4e36fe49572
     players = list()
     for player in player_ids:
         # This doesn't support multiple accounts for each user, refer to issue #8
