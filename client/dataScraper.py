@@ -1,17 +1,20 @@
 from lcu_driver import Connector
 import requests
-# Create config.py when running for the first time
-import config
+# Edit config.json when running for the first time
 import asyncio
 import json
 import time, sys
+import random
+import configparser
 
-import random 
+# Config section
+config = configparser.ConfigParser()
+config.read("../config.ini")
+URL = config["DEFAULT"]["URL"] 
 
 # Test connection to server
-
 try:
-    test = requests.get(config.SITE_URL).json()
+    test = requests.get(URL).json()
 
 except Exception:
     # NEVER DO THIS
@@ -120,7 +123,7 @@ async def connect(connection):
        
     # Check if account is claimed
     try:
-        claimed = requests.get(config.SITE_URL+ f"players/?search={summoner['displayName']}").json()[0]
+        claimed = requests.get(URL+ f"players/?search={summoner['displayName']}").json()[0]
     except IndexError:
         
         print("User does not exist, register through discord please.")
@@ -141,7 +144,7 @@ async def connect(connection):
             prompt = input(f"{claimed['discord']} is trying to claim this account(which you obviously own). Do you want to do that? [y/N]  ")
             if prompt == ("y" or "Y"):
             # TODO: Update api entry
-                account = requests.put(config.SITE_URL + f"players/{claimed['lol']}/", data={
+                account = requests.put(f"{URL}/players/{claimed['lol']}/", data={
                 "lol": summoner["displayName"],
                 "lol_id": summoner["puuid"], 
                 "discord_id":claimed["discord_id"],
@@ -154,7 +157,7 @@ async def connect(connection):
                     print("Something went wrong when claiming your account...")
             else:
             #TODO: Delete api entry
-                requests.delete(config.SITE_URL + f"players/{claimed['discord_id']}")
+                requests.delete(f"{URL}/players/{claimed['discord_id']}")
                 print("Okay, deleting the attempt.")
                 sys.exit()
         
@@ -178,16 +181,16 @@ async def connect(connection):
     match_history = await match_history.json()
   
     # Stage old ids in order for them to be parsed
-    old_ids = requests.get(config.SITE_URL + "games/").json()
+    old_ids = requests.get(f"{URL}/games/").json()
     old_ids = [x["game_id"] for x in old_ids]
 
 
     # TODO: Optimize the process of acquisition of new matches 
     games = await parse_history(connection, match_history, old_ids)
             
-    # Post the new games to your server(change in config.py)
+    # Post the new games to your server(change in config.json)
     for i in games:
-        req = requests.post(config.SITE_URL + "games/", json=i)
+        req = requests.post(f"{URL}/games/", json=i)
         print(req.content)
         if req.status_code == 500:
             print("Serverside error! Contact maintainer!")

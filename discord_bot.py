@@ -3,8 +3,14 @@ import discord
 from discord.ext import commands
 import random
 import requests
+import json
+import configparser
 
-URL = "your url"
+config = configparser.ConfigParser()
+config.read("config.ini")
+URL = config["DEFAULT"]["URL"]
+
+    
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -19,11 +25,14 @@ async def on_ready():
 
 
 @bot.command()
-async def randomize(ctx):
+async def randomize(ctx,
+                    team_1 = config['DISCORD']['TEAM_1'],
+                    team_2 = config['DISCORD']['TEAM_2']):
     """Randomizes 10 people into 2 teams"""
-    # Change these to designated team voice channels
-    team_1 = bot.get_channel(1054534012963659826)
-    team_2 = bot.get_channel(1054534093641089084)
+
+    # Change these to designated team voice channels in config.ini
+    team_1 = bot.get_channel(team_1)
+    team_2 = bot.get_channel(team_2)
     trying_prompt = await ctx.send('Trying to randomize!')
 
     # Fetching user channel
@@ -66,10 +75,12 @@ async def randomize(ctx):
 
 
 @bot.command()
-async def begin_game(ctx):
+async def begin_game(ctx,
+                     team_1 = config['DISCORD']['TEAM_1'],
+                     team_2 = config['DISCORD']['TEAM_2']):
     # Change these to designated team voice channels
-    team_1 = bot.get_channel(1054534012963659826)
-    team_2 = bot.get_channel(1054534093641089084)
+    team_1 = bot.get_channel(team_1)
+    team_2 = bot.get_channel(team_2)
     trying_prompt = await ctx.send('Trying to start fair game!')
 
     # Fetching user channel
@@ -130,7 +141,7 @@ async def register(ctx, *args):
     name = " ".join(args)
     print(name)
     league_name = requests.get(f"{URL}/players/{name}").json()
-    print(league_name.)
+    print(league_name)
     try:
         if not league_name["detail"] == "Not found.":
             return await ctx.send("Someone already claimed this account")
@@ -161,5 +172,5 @@ async def register(ctx, *args):
         return await ctx.send("Success, now approve from client")
     return await ctx.send("Something went wrong...")
 
-# Change to your bot token
-bot.run('TOKEN')
+# Change to your bot token in config.ini
+bot.run(config['DISCORD']['TOKEN'])
