@@ -2,7 +2,6 @@ from rest_framework import viewsets, filters, mixins
 from rest_framework.response import Response
 from .serializers import PlayerSerializer, GameSerializer
 from .models import Player, Game
-import random
 
 import math
 from rest_framework import status
@@ -16,6 +15,9 @@ class WhatTheFuckDidYouDo(Exception):
         super().__init__(self.message)
 
 class PlayerViewSet(viewsets.ModelViewSet):
+    """
+    Display and interaction with the players in the database
+    """
     search_fields = ['discord_id','lol']
     filter_backends = (filters.SearchFilter,)
     queryset = Player.objects.all().order_by('mmr')
@@ -38,6 +40,11 @@ class PlayerViewSet(viewsets.ModelViewSet):
 
 @api_view(['GET', 'POST'])
 def games(request):
+    """
+    Interaction with logging games.
+    Returns codes of games that have already been looked at 
+    and accepts new games. No checks are being done in this function itself, all checks are within the client.
+    """
     if request.method == 'GET':
         games = Game.objects.all()
         serializer = GameSerializer(games, many=True)
@@ -54,13 +61,23 @@ def games(request):
 
 @api_view(['GET'])
 def game(request):
-    player_ids = request.data.get("players")
+    """
+    Returns fair team composition for a given list of players
+    """
+    player_ids = request.data.getlist("players")
     players = list()
+    failed = False
     for player in player_ids:
         # This doesn't support multiple accounts for each user, refer to issue #8
-        p = Player.objects.get(lol=player)
-        players.append({"lol": p.lol, "discord_id":p.discord_id, "mmr":p.mmr})
+        try:
+            p = Player.objects.get(lol=player)
+            players.append({"lol": p.lol, "discord_id":p.discord_id, "mmr":p.mmr, "status": True})
+        except Player.DoesNotExist:
+            failed = True
+            players.append({"lol": player, "found": False})
 
+    if failed:
+        return Response([x for x in players if x["found"] == False], status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
     
     players.sort(key=lambda x: x['mmr'], reverse=True)
 
@@ -105,11 +122,16 @@ def game(request):
     # Create two teams of five players each
     team1 = group1[::2] + group2[1::2]
     team2 = group2[::2] + group1[1::2]
-
+    
     return Response({team1, team2})
 
+
+
 def mmr_on_game(ign:str, avg_enemy_mmr:int, kda:float, outcome:bool):
-    
+    """
+    MMR changing function
+    ELO rating system implementation
+    """
     # Calculate probability of win
     # 1 / (1 + ((loser-winner)^10)/400)
     player = Player.objects.get(lol=ign)
@@ -147,6 +169,10 @@ def mmr_on_game(ign:str, avg_enemy_mmr:int, kda:float, outcome:bool):
 
 
 def average_mmr(game):
+    """
+    Average MMR function
+    Calculates average mmr for a given game
+    """
     teams = game["participants"]
     outcome = ("t1","t2") if teams["t1"]["won"] else ("t2","t1")
     
@@ -154,6 +180,7 @@ def average_mmr(game):
     losers = list()
     player_count = 1
     
+    # Gets average for each the losers and the winners
     for team in outcome:
         for user in teams[team]["summoners"]:
             print(user["name"])
@@ -168,16 +195,18 @@ def average_mmr(game):
             
             else:
                 losers.append(player.mmr)
-            
-  
 
-   
             player_count += 1
 
     return sum(winners)/5, sum(losers)/5
     
 
 def parse_game(game):
+    """
+    Parse game function
+    Calculates mmr for each player in a given game
+    Changes their mmr accordingly
+    """
     teams = game["participants"]
     winner, loser = average_mmr(game)
     
