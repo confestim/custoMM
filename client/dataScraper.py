@@ -2,9 +2,7 @@ from lcu_driver import Connector
 import requests
 # Edit config.json when running for the first time
 import asyncio
-import json
 import time, sys
-import random
 import configparser
 
 # Config section
@@ -38,38 +36,23 @@ class WhatTheFuckDidYouDo(Exception):
 
 
 def calculate_kda(kills:int, assists:int, deaths:int):
+    """
+    Calculates kill, death, assist ratio
+    Input: kills, assists, deaths
+    Output: KDA ratio
+    """
     if deaths == 0:
         deaths = 1
     return round((kills+assists)/deaths, 3)
 
 
 async def parse_history(connection, history:dict, old_ids:list) -> list:
-    # Parses current player's history
-    # Input: Logged in player's match history
-    # Output: New data about unaccounted for custom games, ready to send to server
     """
-    {
-    "game_id": "12345",
-    "participants": {
-        "t1": {
-        "won":true,
-        "summoners": [
-            {
-            "name": "summoner",
-            "kda": 0.333,
-            },
-        ]
-        }
-        },
-        "t2": {
-        "won":false,
-        "summoners": {
-            ...
-        }
-        }
-    }
-    }
+    Parses current player's history
+    Input: Logged in player's match history
+    Output: New data about unaccounted for custom games, ready to send to server
     """
+
     parsed_matches = []
     new = 0
     for i in history["games"]["games"]:
@@ -116,6 +99,10 @@ async def parse_history(connection, history:dict, old_ids:list) -> list:
 # Get current summoner
 @connector.ready
 async def connect(connection):
+    """Data scraper for the league client"""
+
+    # TODO: Check if league is running
+    
     # Summoner 
     summoner = await connection.request('get', '/lol-summoner/v1/current-summoner')
     summoner = await summoner.json()
@@ -199,6 +186,7 @@ async def connect(connection):
     
 @connector.close
 async def disconnect(connection):
+    """Disconnects from the league client"""
     print('Harvesting is over!')
     
 # Begin

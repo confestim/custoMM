@@ -3,14 +3,13 @@ import discord
 from discord.ext import commands
 import random
 import requests
-import json
 import configparser
 
 config = configparser.ConfigParser()
 config.read("config.ini")
 URL = config["DEFAULT"]["URL"]
 
-    
+
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -28,7 +27,7 @@ async def on_ready():
 async def randomize(ctx,
                     team_1 = config['DISCORD']['TEAM_1'],
                     team_2 = config['DISCORD']['TEAM_2']):
-    """Randomizes 10 people into 2 teams"""
+    """Randomizes 10 people into 2 teams: !randomize"""
 
     # Change these to designated team voice channels in config.ini
     team_1 = bot.get_channel(team_1)
@@ -78,9 +77,11 @@ async def randomize(ctx,
 async def begin_game(ctx,
                      team_1 = config['DISCORD']['TEAM_1'],
                      team_2 = config['DISCORD']['TEAM_2']):
+    """Tries to start a fair game: !begin_game"""
     # Change these to designated team voice channels
     team_1 = bot.get_channel(team_1)
     team_2 = bot.get_channel(team_2)
+
     trying_prompt = await ctx.send('Trying to start fair game!')
 
     # Fetching user channel
@@ -98,6 +99,7 @@ async def begin_game(ctx,
 
     valid_players = []
     # This does not support multiple accounts, refer to issue #7
+    # Initial check for existing players
     for i in players:
         print(i.name)
         player = requests.get(f"{URL}/players/?search={i.id}").json()
@@ -107,19 +109,32 @@ async def begin_game(ctx,
         else:
             valid_players.append(player[0]["lol"])
 
+    # If not enough players, return
     if len(valid_players) < 10:
         return await ctx.send("Couldn't create fair game. Whoever isn't registered, please do.")
 
+    # Getting the players
     query_string = "&".join(["".format(player) for player in valid_players])
 
     teams = requests.get(
-        f"{URL}/game?{query_string}").json()
-    print(teams)
+        f"{URL}/game?{query_string}")
+
+    # Second check for existing players
+    # Also, funny status code
+    if teams.status_code == 451:
+        for i in teams.content:
+            await ctx.send(f"{i} has not been found by the API. Please register in order to calculate MMR more accurately.")
+        return
+    teams = teams.json()
     # Embedding
     one_em = discord.Embed(title=f"Team 1", colour=discord.Colour(0x8c0303))
 
     two_em = discord.Embed(title=f"Team 2", colour=discord.Colour(0x0B5394))
+    
+    # TODO: DEBUG, remove
     print(teams)
+
+    # Splitting logic
     for i in teams[0]:
         player = await bot.get_user(i["discord_id"])
         await player.move_to(team_1)
@@ -129,6 +144,7 @@ async def begin_game(ctx,
         await player.move_to(team_2)
         two_em.add_field(name=player.name, value=i["lol"])
 
+    # Sending embeds and cleanup
     await ctx.send(embed=one_em)
     await ctx.send(embed=two_em)
     await trying_prompt.delete()
@@ -137,7 +153,7 @@ async def begin_game(ctx,
 
 @bot.command()
 async def register(ctx, *args):
-
+    """Registers a user to the database: !register <league_name>"""
     name = " ".join(args)
     print(name)
     league_name = requests.get(f"{URL}/players/{name}").json()
