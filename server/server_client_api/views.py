@@ -64,7 +64,7 @@ def game(request):
     """
     Returns fair team composition for a given list of players
     """
-    player_ids = request.data.getlist("players")
+    player_ids = request.GET.getlist("players")
     players = list()
     failed = False
     for player in player_ids:
@@ -123,7 +123,7 @@ def game(request):
     team1 = group1[::2] + group2[1::2]
     team2 = group2[::2] + group1[1::2]
     
-    return Response({team1, team2})
+    return Response((team1, team2), status=status.HTTP_200_OK)
 
 
 
