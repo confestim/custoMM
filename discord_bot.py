@@ -155,6 +155,9 @@ async def begin_game(ctx,
 async def register(ctx, *args):
     """Registers a user to the database: !register <league_name>"""
     name = " ".join(args)
+    # TODO: add confirmation dialog
+    if len(name) < 4:
+        return await ctx.send("Provide a normal username (cAsE sEnSiTiVe)")
     print(name)
     league_name = requests.get(f"{URL}/players/{name}").json()
     print(league_name)
