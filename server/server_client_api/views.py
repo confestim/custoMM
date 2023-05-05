@@ -54,7 +54,8 @@ def games(request):
 
 @api_view(['GET'])
 def game(request):
-    player_ids = request.data.get("players")
+    player_ids = request.GET.getlist("players")
+    print(player_ids)
     players = list()
     for player in player_ids:
         # This doesn't support multiple accounts for each user, refer to issue #8
@@ -105,7 +106,7 @@ def game(request):
     # Create two teams of five players each
     team1 = group1[::2] + group2[1::2]
     team2 = group2[::2] + group1[1::2]
-
+    
     return Response({team1, team2})
 
 def mmr_on_game(ign:str, avg_enemy_mmr:int, kda:float, outcome:bool):
