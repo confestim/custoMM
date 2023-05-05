@@ -120,7 +120,7 @@ async def register(ctx, *args):
     print(name)
     league_name = requests.get(URL + f"/{name}").json()
     print(league_name)
-    if league_name:
+    if league_name["discord_id"]:
         return await ctx.send("Someone already claimed this account")
      
    
