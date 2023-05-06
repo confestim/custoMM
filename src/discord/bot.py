@@ -117,4 +117,4 @@ async def register(ctx, *args):
     return await ctx.send("Something went wrong...")
 
 # Change to your bot token in config.ini
-bot.run(Target().token)
+bot.run(Target("no", bot).token)
