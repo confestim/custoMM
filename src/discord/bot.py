@@ -82,7 +82,7 @@ async def register(ctx, *args):
     # TODO: add confirmation dialog
     if len(name) < 4:
         return await ctx.send("Provide a normal username (cAsE sEnSiTiVe)")
-    print(name)
+    print(target.URL)
     league_name = requests.get(f"{target.URL}/players/{name}").json()
     print(league_name)
 
