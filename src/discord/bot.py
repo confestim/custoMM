@@ -23,7 +23,7 @@ async def on_ready():
 async def randomize(ctx):
     """Randomizes 10 people into 2 teams: !randomize"""
     target = Target(ctx, bot)
-    target.randomize()
+    await target.randomize()
     return
 
 
@@ -32,7 +32,7 @@ async def begin_game(ctx):
     """Tries to start a fair game: !begin_game"""
     target = Target(ctx, bot)
 
-    players = Target.ready()
+    players = await Target.ready()
     if not players:
         return
     
@@ -70,7 +70,7 @@ async def begin_game(ctx):
     # TODO: Debug, remove
     print(teams)
     
-    target.split(teams[0], teams[1])
+    await target.split(teams[0], teams[1])
     return
 
 

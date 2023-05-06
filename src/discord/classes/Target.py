@@ -70,8 +70,8 @@ class Target:
         await self.trying_prompt.delete()
         return
     
-    def randomize(self):
-        players = self.ready()
+    async def randomize(self):
+        players = await self.ready()
         if not players:
             return False
         
