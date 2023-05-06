@@ -114,10 +114,10 @@ async def begin_game(ctx,
         return await ctx.send("Couldn't create fair game. Whoever isn't registered, please do.")
 
     # Getting the players
-    query_string = "&".join(["".format(player) for player in valid_players])
+    query_string = "?"+"&".join(["player={}".format(player) for player in valid_players])
 
     teams = requests.get(
-        f"{URL}/game?{query_string}")
+        f"{URL}/game/?{query_string}")
 
     # Second check for existing players
     # Also, funny status code
