@@ -1,7 +1,6 @@
 import asyncio
 import discord
 from discord.ext import commands
-import random
 import requests
 from urllib.parse import quote
 from classes.Target import Target

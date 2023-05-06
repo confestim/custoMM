@@ -3,7 +3,7 @@ import requests
 
 # Edit config.ini when running for the first time
 import asyncio
-import time, sys
+import sys
 import configparser
 
 # Custom imports
