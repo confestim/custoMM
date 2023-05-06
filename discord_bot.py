@@ -4,6 +4,7 @@ from discord.ext import commands
 import random
 import requests
 import configparser
+from urllib.parse import quote
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -102,7 +103,7 @@ async def begin_game(ctx,
     # Initial check for existing players
     for i in players:
         print(i.name)
-        player = requests.get(f"{URL}/players/?search={i.id}").json()
+        player = requests.get(f"{URL}/players/?search={quote(i.id)}").json()
         print(player)
         if not player:
             await ctx.send(f"<@{i.id}> has no league account associated with their name. Please register in order to calculate MMR more accurately.")
@@ -114,7 +115,7 @@ async def begin_game(ctx,
         return await ctx.send("Couldn't create fair game. Whoever isn't registered, please do.")
 
     # Getting the players
-    query_string = "?"+"&".join(["player={}".format(player) for player in valid_players])
+    query_string = "?"+"&".join(["players={}".format(quote(player)) for player in valid_players])
 
     teams = requests.get(
         f"{URL}/game/?{query_string}")
