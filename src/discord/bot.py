@@ -77,7 +77,7 @@ async def begin_game(ctx):
 @bot.command()
 async def register(ctx, *args):
     """Registers a user to the database: !register <league_name>"""
-    target = Target()
+    target = Target(ctx, bot)
     name = " ".join(args)
     # TODO: add confirmation dialog
     if len(name) < 4:
