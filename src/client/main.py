@@ -2,7 +2,6 @@ from classes.LolScraper import LolScraper
 import requests
 
 # Edit config.ini when running for the first time
-import asyncio
 import sys
 import configparser
 
@@ -24,15 +23,9 @@ except Exception:
     print("Server seems to be down, please contact admin if it keeps doing this")
     sys.exit()
 
-
-# needed for windows
-asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-
-
 # Init connection
-connector = LolScraper( )
+connector = LolScraper()
 
 # Get current summoner
-@connector.ready
 async def main():
-    await LolScraper.scrape()
+    connector.scrape()

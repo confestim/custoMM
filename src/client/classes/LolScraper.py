@@ -1,19 +1,18 @@
-import lcu_driver
+from lcu_connector import Connector 
 import asyncio
 import requests
 import time, sys
 import configparser
 from .Util import WhatTheFuckDidYouDo
 
-class LolScraper(lcu_driver.Connector):
+class LolScraper():
     def __init__(self, *, loop=None):
-        super().__init__(loop)
-        self.start()
         config = configparser.ConfigParser()
         config.read("../config.ini")
-        self.self.URL = config["DEFAULT"]["self.URL"] 
-    
-    def calculate_kda(kills:int, assists:int, deaths:int):
+        self.URL = config["DEFAULT"]["self.URL"] 
+        self.connection = Connector(start=True)
+
+    def calculate_kda(self, kills:int, assists:int, deaths:int):
         """
         Calculates kill, death, assist ratio
         Input: kills, assists, deaths
@@ -23,7 +22,7 @@ class LolScraper(lcu_driver.Connector):
             deaths = 1
         return round((kills+assists)/deaths, 3)
 
-    async def parse_history(self, history:dict, old_ids:list) -> list:
+    def parse_history(self, history:dict, old_ids:list) -> list:
         """
         Parses current player's history
         Input: Logged in player's match history
@@ -39,8 +38,7 @@ class LolScraper(lcu_driver.Connector):
           if i["gameType"] == "CUSTOM_GAME" and str(i["gameId"]) not in old_ids and not i["gameMode"] == "PRACTICETOOL":
                 
                 new += 1
-                match = await connection.request('get', f'/lol-match-history/v1/games/{i["gameId"]}')
-                match = await match.json()
+                match = connection.get(f'/lol-match-history/v1/games/{i["gameId"]}').json()
                 print(match)
                 parsed_match = {
                             "game_id": match["gameId"],
@@ -75,7 +73,7 @@ class LolScraper(lcu_driver.Connector):
         
         return parsed_matches
 
-    async def scrape(self):
+    def scrape(self):
         """
         Data scraper for the league client
         """
@@ -83,8 +81,7 @@ class LolScraper(lcu_driver.Connector):
         # TODO: Check if league is running
         connection = self.connection
         # Summoner 
-        summoner = await connection.request('get', '/lol-summoner/v1/current-summoner')
-        summoner = await summoner.json()
+        summoner = connection.get('/lol-summoner/v1/current-summoner').json()
 
             
         # Check if account is claimed
@@ -148,8 +145,8 @@ class LolScraper(lcu_driver.Connector):
                 
 
         # Match History
-        match_history = await connection.request('get', '/lol-match-history/v1/products/lol/current-summoner/matches?endIndex=99')
-        match_history = await match_history.json()
+        match_history = connection.get('/lol-match-history/v1/products/lol/current-summoner/matches?endIndex=99')
+        match_history = match_history.json()
 
         # Stage old ids in order for them to be parsed
         old_ids = requests.get(f"{self.URL}/games/").json()
@@ -157,7 +154,7 @@ class LolScraper(lcu_driver.Connector):
 
 
         # TODO: Optimize the process of acquisition of new matches 
-        games = await self.parse_history(connection, match_history, old_ids)
+        games = self.parse_history(match_history, old_ids)
                 
         # Post the new games to your server(change in config.json)
         for i in games:
@@ -168,4 +165,6 @@ class LolScraper(lcu_driver.Connector):
                 sys.exit()
         print("We have added " + str(len(games)) + " games that were unaccounted for to the db.")
         print("Program will now close.")
-        self.stop()
+
+        self.connection.stop()
+        return True
