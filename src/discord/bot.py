@@ -31,7 +31,7 @@ async def begin_game(ctx):
     """Tries to start a fair game: !begin_game"""
     target = Target(ctx, bot)
 
-    players = await Target.ready()
+    players = await target.ready()
     if not players:
         return
     

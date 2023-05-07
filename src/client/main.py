@@ -27,5 +27,8 @@ except Exception:
 connector = LolScraper()
 
 # Get current summoner
-async def main():
+def main():
     connector.scrape()
+    
+if __name__ == "__main__":
+    main()

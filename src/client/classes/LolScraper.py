@@ -8,8 +8,9 @@ from .Util import WhatTheFuckDidYouDo
 class LolScraper():
     def __init__(self, *, loop=None):
         config = configparser.ConfigParser()
-        config.read("../config.ini")
-        self.URL = config["DEFAULT"]["self.URL"] 
+        # Relative paths bad, fix this
+        config.read ("../config.ini")
+        self.URL = config["DEFAULT"]["URL"] 
         self.connection = Connector(start=True)
 
     def calculate_kda(self, kills:int, assists:int, deaths:int):
@@ -39,7 +40,6 @@ class LolScraper():
                 
                 new += 1
                 match = connection.get(f'/lol-match-history/v1/games/{i["gameId"]}').json()
-                print(match)
                 parsed_match = {
                             "game_id": match["gameId"],
                             "participants": {
@@ -159,7 +159,6 @@ class LolScraper():
         # Post the new games to your server(change in config.json)
         for i in games:
             req = requests.post(f"{self.URL}/games/", json=i)
-            print(req.content)
             if req.status_code == 500:
                 print("Serverside error! Contact maintainer!")
                 sys.exit()
