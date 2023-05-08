@@ -79,7 +79,6 @@ def game(request):
     if failed:
         return Response([x for x in players if x["found"] == False], status=status.HTTP_451_UNAVAILABLE_FOR_LEGAL_REASONS)
     
-    players.sort(key=lambda x: x['mmr'], reverse=True)
 
 
     # Sort the list of players based on their mmr values

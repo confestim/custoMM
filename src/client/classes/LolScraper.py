@@ -5,12 +5,13 @@ import time, sys
 import configparser
 from .Util import WhatTheFuckDidYouDo
 
-class LolScraper():
+class LolScraper:
     def __init__(self, *, loop=None):
         config = configparser.ConfigParser()
         # Relative paths bad, fix this
         config.read ("../config.ini")
         self.URL = config["DEFAULT"]["URL"] 
+        
         self.connection = Connector(start=True)
 
     def calculate_kda(self, kills:int, assists:int, deaths:int):
