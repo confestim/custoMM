@@ -4,6 +4,7 @@ from discord.ext import commands
 import requests
 from urllib.parse import quote
 from classes.Target import Target
+import json 
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -82,7 +83,10 @@ async def register(ctx, *args):
     if len(name) < 4:
         return await ctx.send("Provide a normal username (cAsE sEnSiTiVe)")
     print(target.URL)
-    league_name = requests.get(f"{target.URL}/players/{name}").json()
+    try:
+        league_name = requests.get(f"{target.URL}/players/{name}").json()
+    except json.decoder.JSONDecodeError:
+        league_name = None
     print(league_name)
 
     try:
