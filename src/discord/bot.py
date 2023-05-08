@@ -86,7 +86,7 @@ async def register(ctx, *args):
     try:
         league_name = requests.get(f"{target.URL}/players/{name}").json()
     except json.decoder.JSONDecodeError:
-        league_name = "null"
+        league_name = {"detail":"null"}
     print(league_name)
 
     try:
