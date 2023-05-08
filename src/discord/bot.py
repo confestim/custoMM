@@ -83,10 +83,7 @@ async def register(ctx, *args):
     if len(name) < 4:
         return await ctx.send("Provide a normal username (cAsE sEnSiTiVe)")
     print(target.URL)
-    try:
-        league_name = requests.get(f"{target.URL}/players/{name}").json()
-    except json.decoder.JSONDecodeError:
-        league_name = {"detail":"null"}
+    league_name = requests.get(f"{target.URL}/players/{name}").json()
     print(league_name)
 
     try:
