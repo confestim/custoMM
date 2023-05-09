@@ -154,6 +154,8 @@ class Scraper:
         # If you are indeed the creator, create the game and disclose its name to the server
         if checker["creator"] == name:
             created = game.create() 
+            # TODO: This doesn't work, because we need to serve stuff separately(as in private keys)
+            # Fix
             requests.put(f"{self.URL}/current/1", data={
                 "lobby_name": created,
                 "players": 1,

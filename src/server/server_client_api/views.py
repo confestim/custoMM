@@ -43,9 +43,14 @@ def current(request):
     Creates/edits/deletes the current game that's being played and orchestrates
     the matchmaking process.
     """
-    # Change
+    # We need to get the singular game that we want based on the creator
+    # We can't use the default get_object_or_404 because we need to get the
+    # object based on the creator, not the pk
+
+    
     current = Current.objects.all()
     if request.method == "GET":
+        
         serializer = CurrentSerializer(current, many=True)
         return Response(serializer.data)
 
@@ -59,6 +64,7 @@ def current(request):
         return Response("Invalid data.", status=status.HTTP_400_BAD_REQUEST)
     
     if request.method == "PUT":
+        current = Current.objects.filter(creator=request.data.get("creator", None)).first()
         if not current:
             return Response("Current game doesn't exist.", status=status.HTTP_404_NOT_FOUND)
         serializer = CurrentSerializer(current, data=request.data)
