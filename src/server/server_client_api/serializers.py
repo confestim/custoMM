@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Player, Game
+from .models import Player, Game, Current
 
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
@@ -23,3 +23,15 @@ class GameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Game
         fields = ("game_id",)
+
+class CurrentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Current
+        fields = ("lobby_name", "creator", "players", "teams")
+
+    def update(self, instance, validated_data):
+        instance.players = validated_data.get('players', instance.players)
+        instance.lobby_name = validated_data.get('lobby_name', instance.lobby_name)
+        instance.save()
+        return instance

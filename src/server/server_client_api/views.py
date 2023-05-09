@@ -1,7 +1,7 @@
 from rest_framework import viewsets, filters, mixins
 from rest_framework.response import Response
-from .serializers import PlayerSerializer, GameSerializer
-from .models import Player, Game
+from .serializers import PlayerSerializer, GameSerializer, CurrentSerializer
+from .models import Player, Game, Current
 
 import math
 from rest_framework import status
@@ -37,7 +37,41 @@ class PlayerViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['GET', 'POST', "PUT", "DELETE"])
+def current(request):
+    """
+    Creates/edits/deletes the current game that's being played and orchestrates
+    the matchmaking process.
+    """
+    current = Current.objects.last()
+    if request.method == "GET":
+        serializer = CurrentSerializer(current, many=True)
+        return Response(serializer.data)
 
+    if request.method == "POST":
+        if current:
+            return Response("Current game already exists.", status=status.HTTP_409_CONFLICT)
+        serializer = CurrentSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response("Invalid data.", status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == "PUT":
+        if not current:
+            return Response("Current game doesn't exist.", status=status.HTTP_404_NOT_FOUND)
+        serializer = CurrentSerializer(current, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response("Invalid data.", status=status.HTTP_400_BAD_REQUEST)
+    
+    if request.method == "DELETE":
+        if not current:
+            return Response("Current game doesn't exist.", status=status.HTTP_404_NOT_FOUND)
+        current.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 @api_view(['GET', 'POST'])
 def games(request):
     """

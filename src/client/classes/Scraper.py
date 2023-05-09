@@ -5,8 +5,9 @@ import requests
 import time, sys
 import configparser
 from .Util import WhatTheFuckDidYouDo
+from .Game import Game
 
-class LolScraper:
+class Scraper:
     def __init__(self, *, loop=None):
         config = configparser.ConfigParser()
         # Relative paths bad, fix this
@@ -20,6 +21,7 @@ class LolScraper:
             except ClientProcessError:
                 print("League client not open, sleeping...")
                 time.sleep(90)
+        self.summoner = self.connection.get('/lol-summoner/v1/current-summoner').json()
 
 
     def calculate_kda(self, kills:int, assists:int, deaths:int):
@@ -76,7 +78,7 @@ class LolScraper:
                         parsed_match["participants"]["t2"]["summoners"].append({"name":match["participantIdentities"][player]["player"]["summonerName"], "kda": self.calculate_kda(kills, assists, deaths)})
                 parsed_matches.append(parsed_match)
         if not new:
-            print("Already up to date, thanks. Program will now close.")
+            print("Already up to date.")
             time.sleep(3)
             
         
@@ -105,12 +107,11 @@ class LolScraper:
 
         connection = self.connection
         # Summoner 
-        summoner = connection.get('/lol-summoner/v1/current-summoner').json()
 
             
         # Check if account is claimed
         try:
-            claimed = requests.get(f"{self.URL}/players/?search={summoner['displayName']}").json()[0]
+            claimed = requests.get(f"{self.URL}/players/?search={self.summoner['displayName']}").json()[0]
         except Exception as e:
             print(e) 
             return "USER_DOES_NOT_EXIST"
@@ -124,20 +125,75 @@ class LolScraper:
             if claimed['lol_id'] and claimed['lol']:
                     
                 # Notify them (if that is the case) that we will do nothing about their new name (slight TODO).
-                if claimed['lol'] != summoner['displayName']:
+                if claimed['lol'] != self.summoner['displayName']:
                     self.register_summoner(True, claimed)
                 
                 return (claimed['discord'], claimed['lol'])
                     
             # Case 3: Registration has begun, but hasn't finished
             elif claimed['lol'] and not claimed['lol_id']:
-               claimed["lol_id"]=summoner["puuid"]
+               claimed["lol_id"]=self.summoner["puuid"]
                return ["REGISTRATION_IN_PROGRESS", claimed]                  
                 
             # All cases are covered, everything else will be considered a bug.
             else:
                 raise WhatTheFuckDidYouDo()
             
+    def check_for_game(self):
+        """
+        Checks if a game is going on right now.
+        """
+        checker = requests.get(f"{self.URL}/current").json()
+        if not checker:
+            return
+
+        game = Game(connection=self.connection)
+        name = self.summoner["displayName"]
+        # If you are indeed the creator, create the game and disclose its name to the server
+        if checker["creator"] == name:
+            created = game.create() 
+            requests.put(f"{self.URL}/current/{checker['creator']}", data={
+                "lobby_name": created,
+                "players": 1,
+                })
+            # Wait until there are 10 players(confirmed) in the lobby
+            while requests.get(f"{self.URL}/current").json().get("lobby_name") != 10:
+                time.sleep(5)
+        
+            # Start the game
+            game.start()
+ 
+        else:
+            # If you have to join
+            try:
+                name = checker["lobby_name"]
+            except KeyError:
+                # Wait until lobby name becomes available
+                while not requests.get(f"{self.URL}/current").json().get("lobby_name"):
+                    time.sleep(10)
+                checker = requests.get(f"{self.URL}/current").json()
+                name = checker["lobby_name"]
+   
+            # Join the lobby
+            game.join_by_name(name)
+
+            # Update count of players         
+            requests.put(f"{self.URL}/current/{checker['creator']}", data={
+                "lobby_name": checker["lobby_name"],
+                "players": int(checker["players"])+1,
+            }) 
+
+        # Move if you have to
+        
+        # This is buggy, try to find a better way to do this.
+        # Like for example, letting team 1 pass first, and then team 2.
+        if name in game.get_team()[0] and not name in checker["teams"][0]:
+            game.move()
+        elif name in game.get_team()[1] and not name in checker["teams"][1]:
+            game.move()
+                
+        
+
 
     def scrape(self):
         """Scrapes current account and sends it to server"""
@@ -164,4 +220,3 @@ class LolScraper:
                 
         self.connection.stop()
         return len(games)
-

@@ -1,4 +1,3 @@
-from classes.LolScraper import LolScraper
 import requests
 
 # Edit config.ini when running for the first time
@@ -6,9 +5,13 @@ import sys
 import configparser
 from time import sleep
 import threading 
+
 # Custom imports
 from classes.Util import WhatTheFuckDidYouDo
 from classes.UI import UI
+from classes.PeriodicScraper import PeriodicScraper
+from classes.Scraper import Scraper
+
 # Config section
 config = configparser.ConfigParser()
 config.read("../config.ini")
@@ -24,20 +27,16 @@ except Exception:
     print("Server seems to be down, please contact admin if it keeps doing this")
     sys.exit()
 
-def scrape_periodically():
-    sleep(5)
-    while True:
-        connector:LolScraper = LolScraper()
-        connector.scrape()
-        sleep(5 * 60)
-
 # Get current summoner
 def main():
     # Match scraping
+    scraper = Scraper()
+    periodic = PeriodicScraper()
+    # Running the UI
+    ui = UI(scraper=scraper)
     
-    instance:UI = UI()
-    
-    threading.Thread(target=scrape_periodically).start()
-    
+    # Loop until close, let stuff kill itself
+    while threading.active_count() >= 3:
+        sleep(10)
 if __name__ == "__main__":
     main()

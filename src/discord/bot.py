@@ -5,6 +5,7 @@ import requests
 from urllib.parse import quote
 from classes.Target import Target
 import json 
+import random 
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -71,6 +72,12 @@ async def begin_game(ctx):
     print(teams)
     
     await target.split(teams[0], teams[1])
+    requests.post(f"{target.URL}/current/", data={
+        "lobby_name": None,
+        "players": 0,
+        "creator": random.choice(valid_players),
+        "teams": json.dumps(teams)
+    })
     return
 
 
