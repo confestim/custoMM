@@ -143,7 +143,9 @@ class Scraper:
         """
         Checks if a game is going on right now.
         """
-        checker = requests.get(f"{self.URL}/current").json()
+        checker = requests.get(f"{self.URL}/current")
+        import logging
+        logging.info(checker)
         if not checker:
             return
 

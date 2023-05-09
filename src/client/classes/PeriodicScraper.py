@@ -10,6 +10,7 @@ class PeriodicScraper(Thread):
         self.start()
 
     def run(self):
+        self.connector.check_for_game()
         while True:
             self.connector.scrape()
             sleep(5 * 60)
