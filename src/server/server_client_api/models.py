@@ -5,8 +5,8 @@ class Player(models.Model):
     lol = models.CharField(primary_key=True, max_length=60, unique=True )
     lol_id = models.CharField(max_length=60, null=True, blank=True , unique=True)
     discord_id = models.IntegerField(null=True, blank=True)
-    # mmr = models.IntegerField(default=600, editable=False)
-    mmr = models.IntegerField(default=600)
+    mmr = models.IntegerField(default=600, editable=False)
+    #mmr = models.IntegerField(default=600)
     games_played = models.IntegerField(default=0)
     def __str__(self):
         return f"{self.discord}:{self.lol}"

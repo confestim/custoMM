@@ -123,5 +123,15 @@ async def register(ctx, *args):
         return await ctx.send("Success, now approve from client")
     return await ctx.send("Something went wrong...")
 
+@bot.command()
+async def leaderboard(ctx):
+    """Shows the Top 5 leaderboard: !leaderboard"""
+    target = Target(ctx, bot)
+    leaderboard = requests.get(f"{target.URL}/players").json()[:5]
+    leaderboard = '\n'.join([f"x['lol'] with x['mmr']" for x in leaderboard])
+    print(leaderboard)
+    await ctx.send(f"```{leaderboard}```")
+    return
+
 # Change to your bot token in config.ini
 bot.run(Target("no", bot).token)
