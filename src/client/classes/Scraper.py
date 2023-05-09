@@ -156,15 +156,18 @@ class Scraper:
             created = game.create() 
             # TODO: This doesn't work, because we need to serve stuff separately(as in private keys)
             # Fix
-            requests.put(f"{self.URL}/current/1", data={
+            r = requests.put(f"{self.URL}/current/{name}", data={
                 "lobby_name": created,
                 "players": 1,
                 })
+            print(r)
             # Wait until there are 10 players(confirmed) in the lobby
             #while requests.get(f"{self.URL}/current").json()[0].get("lobby_name") != 10:
                 #time.sleep(5)
-        
+
             # Start the game
+            print("starting")
+            time.sleep(2)
             game.start()
  
         else:

@@ -30,6 +30,12 @@ class CurrentSerializer(serializers.ModelSerializer):
         model = Current
         fields = ("lobby_name", "creator", "players", "teams")
 
+    def create(self, validated_data):
+        """
+        Create and return a new `Current` instance, given the validated data.
+        """
+        return Current.objects.create(**validated_data)
+    
     def update(self, instance, validated_data):
         instance.players = validated_data.get('players', instance.players)
         instance.lobby_name = validated_data.get('lobby_name', instance.lobby_name)
