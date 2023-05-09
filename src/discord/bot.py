@@ -128,7 +128,7 @@ async def leaderboard(ctx):
     """Shows the Top 5 leaderboard: !leaderboard"""
     target = Target(ctx, bot)
     leaderboard = requests.get(f"{target.URL}/players").json()[:5]
-    leaderboard = '\n'.join([f"x['lol'] with x['mmr']" for x in leaderboard])
+    leaderboard = '\n'.join([f"{x['lol']} with {x['mmr']}" for x in leaderboard])
     print(leaderboard)
     await ctx.send(f"```{leaderboard}```")
     return
