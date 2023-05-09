@@ -38,13 +38,13 @@ class PlayerViewSet(viewsets.ModelViewSet):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET', 'POST', "PUT", "DELETE"])
-def current(request):
+def current(request, pk=None):
     """
     Creates/edits/deletes the current game that's being played and orchestrates
     the matchmaking process.
     """
     # Change
-    current = Current.objects.filter(id=id)
+    current = Current.objects.filter(creator=pk)
     if request.method == "GET":
         serializer = CurrentSerializer(current, many=True)
         return Response(serializer.data)
