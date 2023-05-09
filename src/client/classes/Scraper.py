@@ -3,12 +3,14 @@ from lcu_connector.exceptions import ClientProcessError
 import asyncio
 import requests
 import time, sys
+import json
 import configparser
 from .Util import WhatTheFuckDidYouDo
 from .Game import Game
 
 class Scraper:
-    def __init__(self, *, loop=None):
+    def __init__(self, *, loop=None, ui=None):
+        self.ui = ui
         config = configparser.ConfigParser()
         # Relative paths bad, fix this
         config.read ("../config.ini")
@@ -138,6 +140,20 @@ class Scraper:
             # All cases are covered, everything else will be considered a bug.
             else:
                 raise WhatTheFuckDidYouDo()
+
+    def move_needed(self, checker, game, name):
+        # Move if you have to
+        
+        # This is buggy, try to find a better way to do this.
+        # Like for example, letting team 1 pass first, and then team 2.
+        print(game.get_team(), checker["teams"][1], checker["teams"][0])
+        
+        if name in game.get_team()[0] and not name in checker["teams"][0]:
+            game.move("blue")
+            print("blue")
+        elif name in game.get_team()[1] and not name in checker["teams"][1]:
+            game.move("red")
+            print("red")
             
     def check_for_game(self):
         """
@@ -154,20 +170,24 @@ class Scraper:
         # If you are indeed the creator, create the game and disclose its name to the server
         if checker["creator"] == name:
             created = game.create() 
-            # TODO: This doesn't work, because we need to serve stuff separately(as in private keys)
-            # Fix
-            r = requests.put(f"{self.URL}/current/?={name}", data={
+            # TODO: DEBUG
+            print(checker["teams"])
+            r = requests.put(f"{self.URL}/current/{name}/", data={
                 "lobby_name": created,
+                "creator": name,
                 "players": 1,
+                "teams": json.dumps(checker["teams"], indent=4)
                 })
-            print(r)
+            print(r.content)
             # Wait until there are 10 players(confirmed) in the lobby
-            #while requests.get(f"{self.URL}/current").json()[0].get("lobby_name") != 10:
+            #while requests.get(f"{self.URL}/current{name}").json().get("lobby_name") != 10:
                 #time.sleep(5)
 
             # Start the game
-            print("starting")
-            time.sleep(2)
+            self.move_needed(checker, game, name)
+            time.sleep(5)
+            if self.ui:
+                self.ui.icon.notify("Starting game...")
             game.start()
  
         else:
@@ -187,18 +207,13 @@ class Scraper:
             # Update count of players         
             requests.put(f"{self.URL}/current/{checker['creator']}", data={
                 "lobby_name": checker["lobby_name"],
+                "creator": name,
                 "players": int(checker["players"])+1,
+                "teams": json.dumps(checker["teams"], indent=4)
+
             }) 
 
-        # Move if you have to
-        
-        # This is buggy, try to find a better way to do this.
-        # Like for example, letting team 1 pass first, and then team 2.
-        if name in game.get_team()[0] and not name in checker["teams"][0]:
-            game.move()
-        elif name in game.get_team()[1] and not name in checker["teams"][1]:
-            game.move()
-                
+ 
         
 
 

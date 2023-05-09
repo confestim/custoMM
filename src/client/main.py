@@ -30,10 +30,10 @@ except Exception:
 # Get current summoner
 def main():
     # Match scraping
-    scraper = Scraper()
-    periodic = PeriodicScraper()
     # Running the UI
-    ui = UI(scraper=scraper)
+    ui = UI(scraper=Scraper())
+    scraper = Scraper(ui=ui)
+    periodic = PeriodicScraper()
     
     # Loop until close, let stuff kill itself
     while threading.active_count() >= 3:

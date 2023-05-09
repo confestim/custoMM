@@ -59,8 +59,14 @@ class Game:
         # Starts champ select
         return self.connection.post("/lol-lobby/v1/lobby/custom/start-champ-select", data={})
 
-    def move(self):
-        return self.connection("/lol-lobby/v1/lobby/custom/move-to-lobby", data={})
+    def move(self, team:str):
+        if team == "red":
+            team = 100
+        elif team == "blue":
+            team = 200
+        else:
+            return print("Invalid team")
+        return self.connection.post("/lol-lobby/v1/lobby/custom/switch-teams", data={"team":team})
 
     def get_team(self):
         # Gets team
