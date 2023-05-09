@@ -20,7 +20,7 @@ class PlayerViewSet(viewsets.ModelViewSet):
     """
     search_fields = ['discord_id','lol']
     filter_backends = (filters.SearchFilter,)
-    queryset = Player.objects.all().order_by('mmr')
+    queryset = Player.objects.all().order_by('mmr').reverse()
     serializer_class = PlayerSerializer
 
     def update(self, request, *args, **kwargs):
