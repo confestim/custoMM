@@ -17,7 +17,7 @@ class Game(models.Model):
 
 class Current(models.Model):
     lobby_name = models.CharField(max_length=30, unique=True)
-    players = models.IntegerField(default=0)
+    players = models.IntegerField(default=0, primary_key=True)
     creator = models.CharField(max_length=30, unique=True)
     teams = models.JSONField(default=dict)
 

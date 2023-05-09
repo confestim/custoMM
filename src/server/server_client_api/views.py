@@ -43,6 +43,7 @@ def current(request):
     Creates/edits/deletes the current game that's being played and orchestrates
     the matchmaking process.
     """
+    # Change
     current = Current.objects.all()
     if request.method == "GET":
         serializer = CurrentSerializer(current, many=True)

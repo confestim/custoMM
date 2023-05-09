@@ -41,7 +41,7 @@ class Game:
     def create(self):
         # Creates game
         conn = self.connection
-        name = "CustoMM" + str(random.randint(100000, 10000000))
+        name = "CustoMM " + str(random.randint(100000, 10000000))
         game = conn.post("/lol-lobby/v2/lobby/", data={
         "customGameLobby": {   
                 "configuration": {

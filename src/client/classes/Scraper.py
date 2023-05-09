@@ -143,7 +143,7 @@ class Scraper:
         """
         Checks if a game is going on right now.
         """
-        checker = requests.get(f"{self.URL}/current")
+        checker = requests.get(f"{self.URL}/current").json()[0]
         import logging
         logging.info(checker)
         if not checker:
@@ -159,8 +159,8 @@ class Scraper:
                 "players": 1,
                 })
             # Wait until there are 10 players(confirmed) in the lobby
-            while requests.get(f"{self.URL}/current").json().get("lobby_name") != 10:
-                time.sleep(5)
+            #while requests.get(f"{self.URL}/current").json()[0].get("lobby_name") != 10:
+                #time.sleep(5)
         
             # Start the game
             game.start()
@@ -171,7 +171,7 @@ class Scraper:
                 name = checker["lobby_name"]
             except KeyError:
                 # Wait until lobby name becomes available
-                while not requests.get(f"{self.URL}/current").json().get("lobby_name"):
+                while not requests.get(f"{self.URL}/current").json()[0].get("lobby_name"):
                     time.sleep(10)
                 checker = requests.get(f"{self.URL}/current").json()
                 name = checker["lobby_name"]
