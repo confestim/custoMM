@@ -156,7 +156,7 @@ class Scraper:
             created = game.create() 
             # TODO: This doesn't work, because we need to serve stuff separately(as in private keys)
             # Fix
-            r = requests.put(f"{self.URL}/current/{name}", data={
+            r = requests.put(f"{self.URL}/current/?={name}", data={
                 "lobby_name": created,
                 "players": 1,
                 })

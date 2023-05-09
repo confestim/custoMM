@@ -37,47 +37,28 @@ class PlayerViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-@api_view(['GET', 'POST', "PUT", "DELETE"])
-def current(request):
+class CurrentViewSet(viewsets.ModelViewSet):
     """
-    Creates/edits/deletes the current game that's being played and orchestrates
-    the matchmaking process.
+    Display and interaction with the active games in the database
     """
-    # We need to get the singular game that we want based on the creator
-    # We can't use the default get_object_or_404 because we need to get the
-    # object based on the creator, not the pk
-
     
-    current = Current.objects.all()
-    if request.method == "GET":
-        
-        serializer = CurrentSerializer(current, many=True)
+    queryset = Current.objects.all()
+    serializer_class = CurrentSerializer
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
         return Response(serializer.data)
 
-    if request.method == "POST":
-        if current:
-            return Response("Current game already exists.", status=status.HTTP_409_CONFLICT)
-        serializer = CurrentSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response("Invalid data.", status=status.HTTP_400_BAD_REQUEST)
-    
-    if request.method == "PUT":
-        current = Current.objects.filter(creator=request.data.get("creator", None)).first()
-        if not current:
-            return Response("Current game doesn't exist.", status=status.HTTP_404_NOT_FOUND)
-        serializer = CurrentSerializer(current, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response("Invalid data.", status=status.HTTP_400_BAD_REQUEST)
-    
-    if request.method == "DELETE":
-        if not current:
-            return Response("Current game doesn't exist.", status=status.HTTP_404_NOT_FOUND)
-        current.delete()
+    def delete(self, request, *args, **kwargs):
+        discord_id = kwargs.get('pk')
+        instance = Current.objects.get(creator=creator)
+        self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
+
     
 @api_view(['GET', 'POST'])
 def games(request):
