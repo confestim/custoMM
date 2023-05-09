@@ -3,7 +3,7 @@ import time
 import configparser
 from .Util import WhatTheFuckDidYouDo
 
-class LolGame:
+class Game:
     def __init__(self, *, loop=None, connection):
         # Config 
         config = configparser.ConfigParser()

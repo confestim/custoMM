@@ -1,6 +1,6 @@
 from time import sleep
 from threading import Thread
-from classes.Scraper import Scraper
+from .Scraper import Scraper
 
 class PeriodicScraper(Thread):
     def __init__(self):
