@@ -15,7 +15,7 @@ class Game(models.Model):
     game_id = models.CharField(max_length=30, unique=True)
 
 
-class Current(models.model):
+class Current(models.Model):
     lobby_name = models.CharField(max_length=30, unique=True)
     players = models.IntegerField(default=0)
     creator = models.CharField(max_length=30, unique=True)
