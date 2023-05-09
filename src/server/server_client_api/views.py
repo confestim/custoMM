@@ -44,7 +44,7 @@ def current(request, pk=None):
     the matchmaking process.
     """
     # Change
-    current = Current.objects.filter(creator=pk)
+    current = Current.objects.filter(pk=pk)
     if request.method == "GET":
         serializer = CurrentSerializer(current, many=True)
         return Response(serializer.data)
