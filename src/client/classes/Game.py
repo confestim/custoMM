@@ -6,11 +6,11 @@ from .Util import WhatTheFuckDidYouDo
 class Game:
     def __init__(self, *, loop=None, connection):
         # Config 
-        config = configparser.ConfigParser()
+        self.config = configparser.ConfigParser()
         # Relative paths bad, fix this
-        config.read ("../config.ini")
-        self.URL = config["DEFAULT"]["URL"] 
-        
+        self.config.read ("../config.ini")
+        self.URL = self.config["DEFAULT"]["URL"] 
+        self.password = self.config["LEAGUE"]["LOBBY_PASS"]
         # Loop until we get connection
         self.connection = connection
 
@@ -26,7 +26,7 @@ class Game:
             
     def join_by_id(self, id):
         # Joins a game, given an id
-        return self.connection.post(f"/lol-lobby/v1/custom-games/{id}/join", data={})
+        return self.connection.post(f"/lol-lobby/v1/custom-games/{id}/join", data={"password":self.password})
 
     def join_by_name(self,name):
         # Joins a game given its name
@@ -48,7 +48,7 @@ class Game:
                     "gameMode": f"CLASSIC", "gameServerRegion": "", "mapId": 11, "mutators": {"id": 6}, "spectatorPolicy": "AllAllowed", "teamSize": 5
                 },
                 "lobbyName": name,
-                "lobbyPassword": None
+                "lobbyPassword": self.password
             },
             "isCustom": True
         })
@@ -62,8 +62,8 @@ class Game:
     def move(self, team:str):
         return self.connection.post("/lol-lobby/v1/lobby/custom/switch-teams", data={})
 
-    def get_team(self):
+    def get_teams(self):
         # Gets team
         cfg = self.connection.get("/lol-lobby/v2/lobby").json()["gameConfig"]
-        return ([x["summonerInternalName"] for x in cfg["customTeam100"]],
-                [x["summonerInternalName"] for x in cfg["customTeam200"]]) 
+        return [[x["summonerInternalName"] for x in cfg["customTeam100"]],
+                [x["summonerInternalName"] for x in cfg["customTeam200"]]]

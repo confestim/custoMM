@@ -15,7 +15,10 @@ class UI():
                 "Check registration", self.check_registration, default=True
             ),
             pystray.MenuItem(
-                f"Manual game report", self.report_game
+                f"Manual game report", self.report
+            ),
+            pystray.MenuItem(
+                f"Check for game", self.check
             ),
             pystray.MenuItem(
                 "Exit", self.quit
@@ -27,8 +30,17 @@ class UI():
         self.check_registration()
         self.icon.run_detached()
         
+    def check(self):
+        self.icon.notify("This is discouraged, as it is done automatically anyway.", "Checking for game...")
+        game = self.scraper.check_for_game()
+        if game == "NO_GAME":
+            self.icon.notify("Please create a game on discord.", "No game found.")
+        elif game == "CREATED":
+            self.icon.notify("GLHF!", "You are the host of a new game!",)
+        elif game == "JOINED":
+            self.icon.notify("Waiting for players...", "Game joined!")
 
-    def report_game(self):
+    def report(self):
         self.icon.notify("Game report initiated.")
         logging.warning(self.icon)
         self.scraper.scrape()
