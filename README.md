@@ -1,8 +1,10 @@
 # custoMM
 <p align="center">
 <img src="images/logo.png"/>
+<img alt="Python => 3.11" src="https://img.shields.io/badge/Python-%3E%3D3.11-green)"/>
+<img alt="Version 1.1.1" src="https://img.shields.io/badge/Version-1.1.1-blueviolet" />
 </p>  
-![PyVer >= 3.11](https://img.shields.io/badge/Python-%3E%3D3.11-green)![Ver = 1.1.1](https://img.shields.io/badge/Version-1.1.1-blueviolet)
+
 
 ## What is this?
 This is a project inspired by a heavy loss while playing customs in league of legends. The idea is to create fair teams, without taking rank into account(cuz that's boring and we're antiestablishmentarians 🗿♿🥶).
