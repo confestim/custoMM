@@ -11,12 +11,13 @@ from .Game import Game
 class Scraper:
     def __init__(self, *, loop=None, ui=None):
         self.ui = ui
-        config = configparser.ConfigParser()
+        self.config = configparser.ConfigParser()
         # Relative paths bad, fix this
-        config.read ("../config.ini")
-        self.URL = config["DEFAULT"]["URL"] 
+        self.config.read ("../config.ini")
+        self.URL = self.config["DEFAULT"]["URL"] 
         # Loop until we get connection
         self.connection = None
+        
         while not self.connection:
             try:
                 self.connection = Connector(start=True)
@@ -24,7 +25,7 @@ class Scraper:
                 print("League client not open, sleeping...")
                 time.sleep(90)
         self.summoner = self.connection.get('/lol-summoner/v1/current-summoner').json()
-
+        self.name = self.summoner["displayName"]
 
     def calculate_kda(self, kills:int, assists:int, deaths:int):
         """
@@ -146,49 +147,53 @@ class Scraper:
         
         # This is buggy, try to find a better way to do this.
         # Like for example, letting team 1 pass first, and then team 2.
-        print(game.get_team(), checker["teams"][1], checker["teams"][0])
+        local_teams = game.get_teams()
+        print(local_teams[0], local_teams[1], checker["teams"][0], checker["teams"][1])
         
-        if name in game.get_team()[0] and not name in checker["teams"][0]:
+        if name in local_teams[0] and not name in checker["teams"][0]:
             game.move("blue")
             print("blue")
-        elif name in game.get_team()[1] and not name in checker["teams"][1]:
+        elif name in local_teams[1] and not name in checker["teams"][1]:
             game.move("red")
             print("red")
-            
+
+    def start(self, checker, game):
+        self.move_needed(checker, game, self.name)
+        time.sleep(5)
+        # Wait until there are 10 players(confirmed) in the lobby
+        while requests.get(f"{self.URL}/current/{self.name}").json()["players"] != 10:
+            print("Waiting for players...")
+            time.sleep(5)
+        game.start()
+        requests.delete(f"{self.URL}/current/{self.name}")
+
     def check_for_game(self):
         """
         Checks if a game is going on right now.
         """
-        checker = requests.get(f"{self.URL}/current").json()[0]
-        import logging
-        logging.info(checker)
-        if not checker:
-            return
-
+        try:
+            checker = requests.get(f"{self.URL}/current").json()[0]
+        except IndexError:
+            return "NO_GAME"
         game = Game(connection=self.connection)
-        name = self.summoner["displayName"]
+        
         # If you are indeed the creator, create the game and disclose its name to the server
-        if checker["creator"] == name:
+        if checker["creator"] == self.name:
             created = game.create() 
             # TODO: DEBUG
             print(checker["teams"])
-            r = requests.put(f"{self.URL}/current/{name}/", data={
+            r = requests.put(f"{self.URL}/current/{self.name}/", data={
                 "lobby_name": created,
-                "creator": name,
+                "creator": self.name,
                 "players": 1,
                 "teams": json.dumps(checker["teams"], indent=4)
                 })
             print(r.content)
-            # Wait until there are 10 players(confirmed) in the lobby
-            #while requests.get(f"{self.URL}/current{name}").json().get("lobby_name") != 10:
-                #time.sleep(5)
+            
 
             # Start the game
-            self.move_needed(checker, game, name)
-            time.sleep(5)
-            if self.ui:
-                self.ui.icon.notify("Starting game...")
-            game.start()
+            self.start(checker, game)
+            return "CREATED"
  
         else:
             # If you have to join
@@ -211,8 +216,9 @@ class Scraper:
                 "players": int(checker["players"])+1,
                 "teams": json.dumps(checker["teams"], indent=4)
 
-            }) 
-
+            })
+            return "JOINED" 
+        
  
         
 
