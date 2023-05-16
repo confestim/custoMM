@@ -1,6 +1,6 @@
 from lcu_connector import Connector
 from lcu_connector.exceptions import ClientProcessError
-import asyncio
+import logging
 import requests
 import time, sys
 import json
@@ -20,7 +20,8 @@ class Scraper:
         
         while not self.connection:
             try:
-                self.connection = Connector(start=True)
+                self.connection = Connector()
+                self.connection.start()
             except ClientProcessError:
                 print("League client not open, sleeping...")
                 time.sleep(90)
@@ -127,7 +128,7 @@ class Scraper:
             # Case 2: It belongs to somebody
             if claimed['lol_id'] and claimed['lol']:
                     
-                # Notify them (if that is the case) that we will do nothing about their new name (slight TODO).
+                # Change name in db if different in-game
                 if claimed['lol'] != self.summoner['displayName']:
                     self.register_summoner(True, claimed)
                 
@@ -148,23 +149,31 @@ class Scraper:
         # This is buggy, try to find a better way to do this.
         # Like for example, letting team 1 pass first, and then team 2.
         local_teams = game.get_teams()
-        print(local_teams[0], local_teams[1], checker["teams"][0], checker["teams"][1])
         
         if name in local_teams[0] and not name in checker["teams"][0]:
-            game.move("blue")
-            print("blue")
+            game.move()
+            logging.info("Moving to Team 2")
         elif name in local_teams[1] and not name in checker["teams"][1]:
-            game.move("red")
-            print("red")
+            game.move()
+            logging.info("Moving to Team 1")
 
     def start(self, checker, game):
         self.move_needed(checker, game, self.name)
         time.sleep(5)
         # Wait until there are 10 players(confirmed) in the lobby
-        while requests.get(f"{self.URL}/current/{self.name}").json()["players"] != 10:
-            print("Waiting for players...")
+        timeout_counter = 0
+        while response := requests.get(f"{self.URL}/current/{self.name}").json()["players"] != 10:
+            logging.info("Waiting for players...")
+            timeout_counter += 5
+            if timeout_counter == 60:
+                logging.info("Timeout, aborting...")
+                break
             time.sleep(5)
-        game.start()
+        if response == 10:
+            logging.info("Starting game...")
+            game.start()
+        else:
+            game.leave()
         requests.delete(f"{self.URL}/current/{self.name}")
 
     def check_for_game(self):
@@ -246,5 +255,4 @@ class Scraper:
             if req.status_code == 500:
                 print("Serverside error! Contact maintainer!")
                 
-        self.connection.stop()
         return len(games)

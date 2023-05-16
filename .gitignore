@@ -8,3 +8,4 @@ dist/
 .vscode/
 
 src/client/riotgames.pem
+src/client/main.spec

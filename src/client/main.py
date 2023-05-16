@@ -4,7 +4,7 @@ import requests
 import sys
 import configparser
 from time import sleep
-import threading 
+import logging 
 
 # Custom imports
 from classes.Util import WhatTheFuckDidYouDo
@@ -16,6 +16,7 @@ from classes.Scraper import Scraper
 config = configparser.ConfigParser()
 config.read("../config.ini")
 URL = config["DEFAULT"]["URL"] 
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 # Test connection to server
 try:
@@ -31,12 +32,11 @@ except Exception:
 def main():
     # Match scraping
     # Running the UI
-    ui = UI(scraper=Scraper())
-    scraper = Scraper(ui=ui)
     periodic = PeriodicScraper()
+    ui = UI(scraper=periodic.connector, periodic=periodic)
+    periodic.start()
+    periodic.join()
     
-    # Loop until close, let stuff kill itself
-    while threading.active_count() >= 3:
-        sleep(10)
+
 if __name__ == "__main__":
     main()

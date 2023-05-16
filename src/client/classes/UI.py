@@ -4,12 +4,11 @@ from .Scraper import Scraper
 image = Image.open("assets/icon.png")
 import pyautogui
 from time import sleep
-import logging
 
 class UI():
 	
-    def __init__(self,scraper):
-
+    def __init__(self,scraper, periodic):
+        self.periodic = periodic
         self.menu = pystray.Menu(
             pystray.MenuItem(
                 "Check registration", self.check_registration, default=True
@@ -30,6 +29,7 @@ class UI():
         self.check_registration()
         self.icon.run_detached()
         
+        
     def check(self):
         self.icon.notify("This is discouraged, as it is done automatically anyway.", "Checking for game...")
         game = self.scraper.check_for_game()
@@ -42,7 +42,6 @@ class UI():
 
     def report(self):
         self.icon.notify("Game report initiated.")
-        logging.warning(self.icon)
         self.scraper.scrape()
         self.icon.notify("Game reported", "Your game has been reported to the server.")
             
@@ -65,4 +64,5 @@ class UI():
     
     def quit(self, icon, query):
         icon.stop()
+        self.periodic.closed = True
 

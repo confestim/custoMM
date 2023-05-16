@@ -1,16 +1,23 @@
 from time import sleep
 from threading import Thread
 from .Scraper import Scraper
+import logging
 
 class PeriodicScraper(Thread):
     def __init__(self):
         Thread.__init__(self)
         self.daemon = True
         self.connector:Scraper = Scraper()
-        self.start()
+        self.closed = False
 
     def run(self):
-        self.connector.check_for_game()
         while True:
+            if self.closed:
+                self.connector.connection.stop()
+                break
+        
+            game_state = self.connector.check_for_game()
+            
+            logging.info("Scraping...")
             self.connector.scrape()
-            sleep(5 * 60)
+            sleep(5)

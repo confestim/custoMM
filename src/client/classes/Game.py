@@ -59,9 +59,11 @@ class Game:
         # Starts champ select
         return self.connection.post("/lol-lobby/v1/lobby/custom/start-champ-select", data={})
 
-    def move(self, team:str):
+    def move(self):
         return self.connection.post("/lol-lobby/v1/lobby/custom/switch-teams", data={})
 
+    def leave(self):
+        return self.connection.delete("/lol-lobby/v2/lobby")
     def get_teams(self):
         # Gets team
         cfg = self.connection.get("/lol-lobby/v2/lobby").json()["gameConfig"]
