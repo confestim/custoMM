@@ -6,6 +6,5 @@ migrations/
 build/
 dist/
 .vscode/
-
-src/client/riotgames.pem
-src/client/main.spec
+riotgames.pem
+main.spec
