@@ -54,8 +54,7 @@ class CurrentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def delete(self, request, *args, **kwargs):
-        discord_id = kwargs.get('pk')
-        instance = Current.objects.get(creator=creator)
+        instance = Current.objects.get(creator=request.data.get("creator"))
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
