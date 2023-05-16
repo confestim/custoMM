@@ -9,11 +9,10 @@ from .Util import WhatTheFuckDidYouDo
 from .Game import Game
 
 class Scraper:
-    def __init__(self, *, loop=None, ui=None):
+    def __init__(self, *, loop=None, ui=None, config):
         self.ui = ui
-        self.config = configparser.ConfigParser()
+        self.config = config
         # Relative paths bad, fix this
-        self.config.read ("../config.ini")
         self.URL = self.config["DEFAULT"]["URL"] 
         # Loop until we get connection
         self.connection = None
@@ -184,7 +183,7 @@ class Scraper:
             checker = requests.get(f"{self.URL}/current").json()[0]
         except IndexError:
             return "NO_GAME"
-        game = Game(connection=self.connection)
+        game = Game(connection=self.connection, config=self.config)
         
         # If you are indeed the creator, create the game and disclose its name to the server
         if checker["creator"] == self.name:

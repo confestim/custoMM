@@ -4,11 +4,8 @@ import configparser
 from .Util import WhatTheFuckDidYouDo
 
 class Game:
-    def __init__(self, *, loop=None, connection):
-        # Config 
-        self.config = configparser.ConfigParser()
-        # Relative paths bad, fix this
-        self.config.read ("../config.ini")
+    def __init__(self, *, loop=None, connection,config):
+        self.config = config
         self.URL = self.config["DEFAULT"]["URL"] 
         self.password = self.config["LEAGUE"]["LOBBY_PASS"]
         # Loop until we get connection

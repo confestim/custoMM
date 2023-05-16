@@ -1,10 +1,22 @@
-config.ini
+# Config
+src/config.ini
+
+# Environment
 .env/
+
+# Database
 db.sqlite3
+
+# Build garbage
 __pycache__/
 migrations/
 build/
 dist/
-.vscode/
-riotgames.pem
 main.spec
+
+# VSCode garbage
+.vscode/
+
+# LCU_connector leftover
+riotgames.pem
+test.py
