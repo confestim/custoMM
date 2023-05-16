@@ -1,13 +1,14 @@
 import pystray
 from PIL import Image
 from .Scraper import Scraper
-image = Image.open("assets/icon.png")
 import pyautogui
 from time import sleep
 
 class UI():
 	
-    def __init__(self,scraper, periodic):
+    def __init__(self,scraper, periodic, parent):
+        image = Image.open(parent + "\\assets\\icon.png")
+
         self.periodic = periodic
         self.menu = pystray.Menu(
             pystray.MenuItem(

@@ -2,6 +2,7 @@ import requests
 
 # Edit config.ini when running for the first time
 import sys
+import os
 import configparser
 from time import sleep
 import logging 
@@ -13,8 +14,10 @@ from classes.PeriodicScraper import PeriodicScraper
 from classes.Scraper import Scraper
 
 # Config section
+parent = os.path.dirname(os.path.abspath(__file__))
 config = configparser.ConfigParser()
-config.read("../config.ini")
+logging.info(parent + "\\config.ini")
+print(parent + "\\config.ini")
 URL = config["DEFAULT"]["URL"] 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -33,7 +36,7 @@ def main():
     # Match scraping
     # Running the UI
     periodic = PeriodicScraper()
-    ui = UI(scraper=periodic.connector, periodic=periodic)
+    ui = UI(scraper=periodic.connector, periodic=periodic, parent=parent)
     periodic.start()
     periodic.join()
     
