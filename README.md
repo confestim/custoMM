@@ -1,6 +1,6 @@
 # custoMM
 <p align="center">
-<img src="images/logo.png"/>
+<img src="images/logo.png"/><br>
 <img alt="Python => 3.11" src="https://img.shields.io/badge/Python-%3E%3D3.11-green)"/>
 <img alt="Version 1.1.1" src="https://img.shields.io/badge/Version-1.1.1-blueviolet" />
 </p>  
