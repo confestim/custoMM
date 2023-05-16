@@ -1,5 +1,5 @@
 # Config
-config.ini
+src/config.ini
 
 # Environment
 .env/

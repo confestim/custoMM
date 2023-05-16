@@ -1,8 +1,7 @@
 import requests
 
 # Edit config.ini when running for the first time
-import sys
-import os
+import sys, os
 import configparser
 from time import sleep
 import logging 
@@ -14,13 +13,20 @@ from classes.PeriodicScraper import PeriodicScraper
 from classes.Scraper import Scraper
 
 # Config section
-parent = os.path.dirname(os.path.abspath(__file__))
-config = configparser.ConfigParser()
-logging.info(parent + "\\config.ini")
-print(parent + "\\config.ini")
-URL = config["DEFAULT"]["URL"] 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
+# Check if bundled
+if getattr(sys, 'frozen', False):
+    base_dir = os.path.dirname(sys.executable)
+elif __file__:
+    base_dir = os.path.dirname(__file__)
+
+logging.info(base_dir)
+config = configparser.ConfigParser()
+conf_path = os.path.join(base_dir, "config.ini")
+logging.info(conf_path)
+config.read(conf_path)
+URL = config["DEFAULT"]["URL"] 
 # Test connection to server
 try:
     test = requests.get(URL).json()
@@ -35,8 +41,8 @@ except Exception:
 def main():
     # Match scraping
     # Running the UI
-    periodic = PeriodicScraper()
-    ui = UI(scraper=periodic.connector, periodic=periodic, parent=parent)
+    periodic = PeriodicScraper(config=config)
+    ui = UI(scraper=periodic.connector, periodic=periodic, base_dir=base_dir)
     periodic.start()
     periodic.join()
     

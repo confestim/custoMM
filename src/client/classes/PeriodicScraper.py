@@ -4,10 +4,10 @@ from .Scraper import Scraper
 import logging
 
 class PeriodicScraper(Thread):
-    def __init__(self):
+    def __init__(self, config):
         Thread.__init__(self)
         self.daemon = True
-        self.connector:Scraper = Scraper()
+        self.connector:Scraper = Scraper(config=config)
         self.closed = False
 
     def run(self):

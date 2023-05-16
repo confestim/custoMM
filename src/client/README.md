@@ -29,9 +29,11 @@ Then, clone the repository.
 If you don't have pyinstaller installed, do:
 `$ pip install pyinstaller`
 Once that's ready, you're ready to compile!
-`$ python -m PyInstaller --onefile main.py`
+`$ python -m PyInstaller --onefile main.py --noconsole`
 
 The exe file will reside in the newly created dist/ folder. Don't forget to copy the assets and the config to the same folder that your EXE resides(that means you will have to send them over to your friends along with the EXE file):
 `cp assets ../config.ini dist`
+
+From here, do whatever with the dist folder, I would recommend zipping it.
  
 
