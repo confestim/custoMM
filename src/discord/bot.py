@@ -18,7 +18,8 @@ async def on_ready():
     print(f'We have logged in as {bot.user}')
     game = discord.Game("Customki - !randomize")
     await bot.change_presence(activity=game, status=discord.Status.dnd)
-
+    a = await bot.fetch_user(284016649378594816)
+    print(a)
 
 @bot.command()
 async def randomize(ctx):
@@ -42,9 +43,8 @@ async def begin_game(ctx):
     # This does not support multiple accounts, refer to issue #7
     # Initial check for existing players
     for i in players:
-        print(i.name)
-        player = requests.get(f"{target.URL}/players/?search={quote(i.id)}").json()
-        print(player)
+
+        player = requests.get(f"{target.URL}/players/?search={i.id}").json()
         if not player:
             await ctx.send(f"<@{i.id}> has no league account associated with their name. Please register in order to calculate MMR more accurately.")
         else:
@@ -56,7 +56,7 @@ async def begin_game(ctx):
 
     # Getting the players
     query_string = "?"+"&".join(["players={}".format(quote(player)) for player in valid_players])
-
+    print(query_string)
     teams = requests.get(
         f"{target.URL}/game/?{query_string}")
 
@@ -71,7 +71,7 @@ async def begin_game(ctx):
     # TODO: Debug, remove
     print(teams)
     
-    await target.split(teams[0], teams[1])
+    await target.split(teams[0], teams[1], fair=True)
     requests.post(f"{target.URL}/current/", data={
         "lobby_name": None,
         "players": 0,
