@@ -44,21 +44,27 @@ class Target:
         
         return players     
       
-    async def split(self, players_1, players_2):
+    async def split(self, players_1, players_2, fair):
         """
         Splits players into 2 teams
         """
 
         # Declaring channels
-        team_1 = self.bot.get_channel(self.team_1)
-        team_2 = self.bot.get_channel(self.team_2)
+        team_1 = await self.bot.get_channel(self.team_1)
+        team_2 = await self.bot.get_channel(self.team_2)
         
         # Embedding
         one_em = discord.Embed(title=f"Team 1", colour=discord.Colour(0x8c0303))
         two_em = discord.Embed(title=f"Team 2", colour=discord.Colour(0x0B5394))
         
+        # Format if fair
+        if fair:
+            players_1 = [await self.bot.fetch_user(x["discord_id"]) for x in players_1]
+            players_2 = [await self.bot.fetch_user(x["discord_id"]) for x in players_2]
+
         # Splitting logic
         for i in range(5):
+            print(players_1[i])
             await players_1[i].move_to(team_1)
             one_em.add_field(name=players_1[i].name, value=f"<@{players_2[i].id}>")
             await players_2[i].move_to(team_2)
