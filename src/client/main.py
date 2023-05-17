@@ -4,7 +4,7 @@ import requests
 import sys, os
 import configparser
 from time import sleep
-import logging 
+from logging import info, basicConfig, INFO
 
 # Custom imports
 from classes.Util import WhatTheFuckDidYouDo
@@ -12,11 +12,12 @@ from classes.UI import UI
 from classes.PeriodicScraper import PeriodicScraper
 from classes.Scraper import Scraper
 from classes.SelfUpdate import SelfUpdate
+from classes.Notify import Notify
 
 VERSION = "1.1.1"
 
 # Config section
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+basicConfig(format='%(asctime)s - %(message)s', level=INFO)
 
 # Check if bundled
 if getattr(sys, 'frozen', False):
@@ -24,12 +25,15 @@ if getattr(sys, 'frozen', False):
 elif __file__:
     base_dir = os.path.dirname(__file__)
 
-logging.info(base_dir)
+info("Base directory - " + base_dir)
+
+# Parse config
 config = configparser.ConfigParser()
 conf_path = os.path.join(base_dir, "config.ini")
-logging.info(conf_path)
 config.read(conf_path)
 URL = config["DEFAULT"]["URL"] 
+
+
 # Test connection to server
 try:
     test = requests.get(URL).json()
@@ -37,16 +41,19 @@ try:
 except Exception:
     # NEVER DO THIS
     # although, what could go wrong...
-    print("Server seems to be down, please contact admin if it keeps doing this")
+    Notify(base_dir=base_dir, exit_after=True).notification("Server seems to be down, please contact admin if it keeps doing this")
     sys.exit()
 
 # Get current summoner
 def main():
     # Match scraping
-    # Running the UI
-    periodic = PeriodicScraper(config=config)
+    # Periodic scraper
+    periodic = PeriodicScraper(config=config, base_dir=base_dir)
+    
     ui = UI(scraper=periodic.connector, periodic=periodic, base_dir=base_dir)
-    update = SelfUpdate(ui=ui, version=VERSION)
+    # Self update only needs to run once, on start of program
+    # TODO: Test this
+    update = SelfUpdate(base_dir=base_dir, version=VERSION)
     periodic.start()
     periodic.join()
     

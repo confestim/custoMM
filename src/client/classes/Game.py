@@ -1,6 +1,7 @@
-import random
-import time
+from random import choice, randint
+from time import sleep
 from .Util import WhatTheFuckDidYouDo
+from logging import info
 
 class Game:
     def __init__(self, *, loop=None, connection,config):
@@ -10,7 +11,7 @@ class Game:
 
     def list_all(self):
         # List all games
-        time.sleep(2)
+        sleep(1)
         self.connection.post("/lol-lobby/v1/custom-games/refresh", data={})
         return self.connection.get("/lol-lobby/v1/custom-games").json()
 
@@ -24,18 +25,35 @@ class Game:
 
     def join_by_name(self,name):
         # Joins a game given its name
-        return self.join_by_id(self.search(str(name))[0])
+        try:
+            return self.join_by_id(self.search(str(name))[0])
+        except IndexError:
+            info("Game not found, try again.")
+            
 
     def join_random(self):
         # Joins a random public game
         # mainly debug reasons
-        return self.join_by_id(random.choice([x["id"] for x in self.list_all() if not x["hasPassword"]]))
+        return self.join_by_id(choice([x["id"] for x in self.list_all() if not x["hasPassword"]]))
         
+    def in_game_with_name(self, lobby_name):
+        try:
+            name = self.connection.get("/lol-lobby/v2/lobby").json()["gameConfig"]["customLobbyName"]
+            if lobby_name == name:
+                return True
+        except Exception as e:
+            info(e)
+        return False
+
+    def leave_with_creator(self, creator):
+        members = [x["summonerName"] for x in self.connection.get("/lol-lobby/v2/lobby/").json()["members"]]
+        if creator not in members:
+            self.leave()
         
     def create(self):
         # Creates game
         conn = self.connection
-        name = "CustoMM " + str(random.randint(100000, 10000000))
+        name = "CustoMM " + str(randint(100000, 10000000))
         game = conn.post("/lol-lobby/v2/lobby/", data={
         "customGameLobby": {   
                 "configuration": {
@@ -58,6 +76,7 @@ class Game:
 
     def leave(self):
         return self.connection.delete("/lol-lobby/v2/lobby")
+
     def get_teams(self):
         # Gets team
         cfg = self.connection.get("/lol-lobby/v2/lobby").json()["gameConfig"]
