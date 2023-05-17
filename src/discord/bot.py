@@ -90,7 +90,7 @@ async def register(ctx, *args):
     target = Target(ctx, bot)
     name = " ".join(args)
     # TODO: add confirmation dialog
-    if (len(name) < 4) and (requests.get(f"https://lolprofile.net/summoner/eune/{name}").status_code != 200):
+    if (len(name) < 4) or (requests.get(f"https://lolprofile.net/summoner/eune/{name}").status_code != 200):
         return await ctx.send("Provide a normal username (cAsE sEnSiTiVe)")
     print(target.URL)
     league_name = requests.get(f"{target.URL}/players/{name}").json()
