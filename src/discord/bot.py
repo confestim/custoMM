@@ -89,7 +89,7 @@ async def register(ctx, *args):
     """Registers a user to the database: !register <league_name>"""
     target = Target(ctx, bot)
     name = " ".join(args)
-    # TODO: add confirmation dialog
+
     if (len(name) < 4) or (requests.get(f"https://lolprofile.net/summoner/eune/{name}").status_code != 200):
         return await ctx.send("Provide a normal username (cAsE sEnSiTiVe)")
     print(target.URL)
@@ -127,14 +127,18 @@ async def register(ctx, *args):
     return await ctx.send("Something went wrong...")
 
 @bot.command()
-async def leaderboard(ctx):
-    """Shows the Top 5 leaderboard: !leaderboard"""
+async def leaderboard(ctx, players=5):
+    """Shows the Top 5 leaderboard: !leaderboard <number_of_players>"""
     target = Target(ctx, bot)
-    leaderboard = requests.get(f"{target.URL}/players").json()[:5]
-    leaderboard = "TOP 5 PLAYERS:\n-------------\n" + '\n'.join([f"{x['lol']} with {x['mmr']}" for x in leaderboard])
-    print(leaderboard)
-    await ctx.send(f"```{leaderboard}```")
-    return
+    leaderboard = requests.get(f"{target.URL}/players").json()
+    if len(leaderboard) > players:
+        return await ctx.send(f"We don't have that many players in the database. We have {len(leaderboard)}")
+    leaderboard = leaderboard[:players]
+    embed = discord.Embed(title=f"Top {players} players", description="Ordered by mmr", color=0xFF5733)
+    embed.set_author(name="custoMM", icon_url="https://git.confest.im/boyan_k/custoMM/raw/branch/main/images/smol_logo.png")
+    fields = [embed.add_field(name=x['lol'], value=x['mmr']) for x in leaderboard]
+    return await ctx.send(embed=embed)
+    
 
 # Change to your bot token in config.ini
 bot.run(Target("no", bot).token)
