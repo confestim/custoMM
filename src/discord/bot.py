@@ -128,11 +128,13 @@ async def register(ctx, *args):
 
 @bot.command(aliases=['lead', 'l'])
 async def leaderboard(ctx, players=5):
-    """Shows the Top <players> leaderboard: !leaderboard <number_of_players>"""
+    """Shows the Top <players> leaderboard: !leaderboard <number_of_players/max>"""
     target = Target(ctx, bot)
     leaderboard = requests.get(f"{target.URL}/players").json()
     if len(leaderboard) < players:
         return await ctx.send(f"We don't have that many players in the database. We have {len(leaderboard)}.")
+    if players == "MAX" or players == "max":
+        players = len(leaderboard)
     leaderboard = leaderboard[:players]
     embed = discord.Embed(title=f"Top {players} players", description="Ordered by mmr", color=0xFF5733)
     embed.set_author(name="custoMM", icon_url="https://git.confest.im/boyan_k/custoMM/raw/branch/main/images/smol_logo.png")
