@@ -164,7 +164,7 @@ class Scraper:
         while response := requests.get(f"{self.URL}/current/{self.name}").json()["players"] != 10:
             logging.info("Waiting for players...")
             timeout_counter += 5
-            if timeout_counter == 60:
+            if timeout_counter == 120:
                 logging.info("Timeout, aborting...")
                 break
             time.sleep(5)
@@ -218,7 +218,7 @@ class Scraper:
             game.join_by_name(name)
 
             # Update count of players         
-            requests.put(f"{self.URL}/current/{checker['creator']}", data={
+            requests.put(f"{self.URL}/current/{checker['creator']}/", data={
                 "lobby_name": checker["lobby_name"],
                 "creator": name,
                 "players": int(checker["players"])+1,

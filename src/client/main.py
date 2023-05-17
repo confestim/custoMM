@@ -11,6 +11,9 @@ from classes.Util import WhatTheFuckDidYouDo
 from classes.UI import UI
 from classes.PeriodicScraper import PeriodicScraper
 from classes.Scraper import Scraper
+from classes.SelfUpdate import SelfUpdate
+
+VERSION = "1.1.1"
 
 # Config section
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
@@ -43,6 +46,7 @@ def main():
     # Running the UI
     periodic = PeriodicScraper(config=config)
     ui = UI(scraper=periodic.connector, periodic=periodic, base_dir=base_dir)
+    update = SelfUpdate(ui=ui, version=VERSION)
     periodic.start()
     periodic.join()
     
