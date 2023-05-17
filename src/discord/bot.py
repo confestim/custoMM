@@ -16,10 +16,9 @@ bot = commands.Bot(intents=intents, command_prefix='!')
 @bot.event
 async def on_ready():
     print(f'We have logged in as {bot.user}')
-    game = discord.Game("Customki - !randomize")
+    game = discord.Game("Custom Matchmaking - !help")
     await bot.change_presence(activity=game, status=discord.Status.dnd)
-    a = await bot.fetch_user(284016649378594816)
-    print(a)
+    
 
 @bot.command()
 async def randomize(ctx):
@@ -30,8 +29,8 @@ async def randomize(ctx):
 
 
 @bot.command()
-async def begin_game(ctx):
-    """Tries to start a fair game: !begin_game"""
+async def ladder(ctx):
+    """Tries to start a fair game: !ladder"""
     target = Target(ctx, bot)
 
     players = await target.ready()
@@ -72,12 +71,16 @@ async def begin_game(ctx):
     print(teams)
     
     await target.split(teams[0], teams[1], fair=True)
+
+    # Create current game
     requests.post(f"{target.URL}/current/", data={
         "lobby_name": None,
         "players": 0,
         "creator": random.choice(valid_players),
         "teams": json.dumps(teams)
     })
+
+
     return
 
 
@@ -87,7 +90,7 @@ async def register(ctx, *args):
     target = Target(ctx, bot)
     name = " ".join(args)
     # TODO: add confirmation dialog
-    if len(name) < 4:
+    if (len(name) < 4) and (requests.get(f"https://lolprofile.net/summoner/eune/{name}").status_code != 200):
         return await ctx.send("Provide a normal username (cAsE sEnSiTiVe)")
     print(target.URL)
     league_name = requests.get(f"{target.URL}/players/{name}").json()
