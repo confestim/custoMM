@@ -1,13 +1,10 @@
 import random
 import time
-import configparser
 from .Util import WhatTheFuckDidYouDo
 
 class Game:
     def __init__(self, *, loop=None, connection,config):
-        self.config = config
-        self.URL = self.config["DEFAULT"]["URL"] 
-        self.password = self.config["LEAGUE"]["LOBBY_PASS"]
+        self.password = str(config["LEAGUE"]["LOBBY_PASS"])
         # Loop until we get connection
         self.connection = connection
 
@@ -27,7 +24,7 @@ class Game:
 
     def join_by_name(self,name):
         # Joins a game given its name
-        return self.join_by_id(self.search(str(name)))
+        return self.join_by_id(self.search(str(name))[0])
 
     def join_random(self):
         # Joins a random public game
