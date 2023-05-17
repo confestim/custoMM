@@ -20,7 +20,7 @@ async def on_ready():
     await bot.change_presence(activity=game, status=discord.Status.dnd)
     
 
-@bot.command()
+@bot.command(aliases=['random'])
 async def randomize(ctx):
     """Randomizes 10 people into 2 teams: !randomize"""
     target = Target(ctx, bot)
@@ -28,7 +28,7 @@ async def randomize(ctx):
     return
 
 
-@bot.command()
+@bot.command(aliases=['begin_game', 'game'])
 async def ladder(ctx):
     """Tries to start a fair game: !ladder"""
     target = Target(ctx, bot)
@@ -84,7 +84,7 @@ async def ladder(ctx):
     return
 
 
-@bot.command()
+@bot.command(aliases=['r', 'reg'])
 async def register(ctx, *args):
     """Registers a user to the database: !register <league_name>"""
     target = Target(ctx, bot)
@@ -126,13 +126,13 @@ async def register(ctx, *args):
         return await ctx.send("Success, now approve from client")
     return await ctx.send("Something went wrong...")
 
-@bot.command()
+@bot.command(aliases=['lead', 'l'])
 async def leaderboard(ctx, players=5):
-    """Shows the Top 5 leaderboard: !leaderboard <number_of_players>"""
+    """Shows the Top <players> leaderboard: !leaderboard <number_of_players>"""
     target = Target(ctx, bot)
     leaderboard = requests.get(f"{target.URL}/players").json()
-    if len(leaderboard) > players:
-        return await ctx.send(f"We don't have that many players in the database. We have {len(leaderboard)}")
+    if len(leaderboard) < players:
+        return await ctx.send(f"We don't have that many players in the database. We have {len(leaderboard)}.")
     leaderboard = leaderboard[:players]
     embed = discord.Embed(title=f"Top {players} players", description="Ordered by mmr", color=0xFF5733)
     embed.set_author(name="custoMM", icon_url="https://git.confest.im/boyan_k/custoMM/raw/branch/main/images/smol_logo.png")
