@@ -127,7 +127,7 @@ async def register(ctx, *args):
     return await ctx.send("Something went wrong...")
 
 @bot.command(aliases=['lead', 'l'])
-async def leaderboard(ctx, players):
+async def leaderboard(ctx, players=None):
     """Shows the Top <players> leaderboard: !leaderboard <number_of_players/max>"""
     target = Target(ctx, bot)
     leaderboard = requests.get(f"{target.URL}/players").json()
