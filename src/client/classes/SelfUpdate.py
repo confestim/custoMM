@@ -16,10 +16,9 @@ class SelfUpdate():
         
         self.version = version
         self.newest = get("https://api.github.com/repos/confestim/custoMM/releases/latest").json()["tag_name"]
+        self.new_version = False
         if self.version != self.newest:
-            Notify(base_dir=base_dir).notification("New version found", f"New version {self.newest} found, updating...", title="CustoMM")
-            sleep(5)
-            self.update()
+            self.new_version = True
         return
     
     def update(self):

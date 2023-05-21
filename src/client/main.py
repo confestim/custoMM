@@ -14,8 +14,6 @@ from classes.Scraper import Scraper
 from classes.SelfUpdate import SelfUpdate
 from classes.Notify import Notify
 
-VERSION = "1.1.1"
-
 # Config section
 basicConfig(format='%(asctime)s - %(message)s', level=INFO)
 
@@ -52,8 +50,6 @@ def main():
     
     ui = UI(scraper=periodic.connector, periodic=periodic, base_dir=base_dir)
     # Self update only needs to run once, on start of program
-    # TODO: Test this
-    update = SelfUpdate(base_dir=base_dir, version=VERSION)
     periodic.start()
     periodic.join()
     

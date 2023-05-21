@@ -6,6 +6,9 @@ import os
 from logging import info
 from .Scraper import Scraper
 from .PeriodicScraper import PeriodicScraper
+from .SelfUpdate import SelfUpdate
+
+VERSION = "1.1.1"
 
 class UI():
     """Tray icon UI module
@@ -17,9 +20,9 @@ class UI():
     """
     def __init__(self,scraper:Scraper, periodic:PeriodicScraper, base_dir):
         
-
+        self.version = VERSION
         image = Image.open(os.path.join(base_dir, os.path.join("assets", "icon.png")))
-        
+        self.base_dir = base_dir
         # Check if user has exited before making a connection with the LoL client
         if periodic.closed:
             return
@@ -38,6 +41,9 @@ class UI():
                 f"Check for game", self.check
             ),
             pystray.MenuItem(
+                "Check for updates", self.update_check
+            ),
+            pystray.MenuItem(
                 "Exit", self.quit
             )
         )
@@ -48,7 +54,18 @@ class UI():
         
         # After ui is running, check user registration
         self.check_registration()
+        self.update_check()
         
+    def update_check(self):
+        # TODO: Test this
+        update = SelfUpdate(base_dir=self.base_dir, version=self.version)
+        if update:
+            prompt = pyautogui.confirm(f"New version available, do you want to update?")
+            if prompt:
+                update.update()
+            else:
+                self.icon.notify("Please update as soon as possible.", "New version available.")
+    
     def check(self):
         """ Checks for ongoing game and notifies user
         """
