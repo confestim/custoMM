@@ -70,7 +70,7 @@ class UI():
         """ Checks for ongoing game and notifies user
         """
 
-        self.icon.notify("This is discouraged, as it is done automatically anyway.", "Checking for game...")
+        self.icon.notify("This is discouraged, as it is done automatically.", "Checking for game...")
         game = self.scraper.check_for_game()
         if game == "NO_GAME":
             self.icon.notify("Please create a game on discord.", "No game found.")
@@ -90,13 +90,13 @@ class UI():
         """ Checks the current logged in user's registration
         """
         self.icon.notify("Checking summoner...", title="custoMM")
+        
         check = self.scraper.check_summoner()
-        if check == "USER_DOES_NOT_EXIST":
-            self.icon.notify("You are not registered, please register on the website.")
-        elif check == "UNCLAIMED":
-            self.icon.notify("You have not claimed your account yet, please claim it on discord -> !registed <ACCOUNT_NAME>.")
+        if check == "UNCLAIMED" or check == "USER_DOES_NOT_EXIST":
+            self.icon.notify("You have not claimed your account yet, please claim it on discord -> !register <ACCOUNT_NAME>.")
+
         elif check[0] == "REGISTRATION_IN_PROGRESS":
-            prompt = pyautogui.confirm(f"Your account is currently being registered by {check[1]}, do you want to proceed?")
+            prompt = pyautogui.confirm(f"Your account({check[1]['lol']}) is currently being registered by {check[1]['discord']} on Discord. Is this you?")
             if prompt:
                 self.scraper.register_summoner(True, check[1])
             else:

@@ -32,10 +32,11 @@ class PeriodicScraper(Thread):
                 except AttributeError:
                     pass
                 break
-        
+
+            info("Checking for game...")
             game_state = self.connector.check_for_game()
-            
+            sleep(self.offset/2)
             info("Scraping...")
             self.connector.scrape()
-            sleep(self.offset)
+            sleep(self.offset/22)
         return

@@ -1,9 +1,7 @@
 from requests import get, put, post, delete
 from wget import download
 from os import system, path
-from time import sleep
-from logging import info
-from .Notify import Notify
+
 
 class SelfUpdate():
     """Checks for new updates and prompts user to install
@@ -24,5 +22,6 @@ class SelfUpdate():
     def update(self):
         """ Updater
         """
+        # TODO: Implement possible asset download (if needed)
         download(f"https://github.com/confestim/custoMM/releases/download/{self.newest}/custoMM_installer.exe")
         system("custoMM_installer.exe")

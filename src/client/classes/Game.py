@@ -1,6 +1,5 @@
 from random import choice, randint
 from time import sleep
-from .Util import WhatTheFuckDidYouDo
 from logging import info
 
 class Game:

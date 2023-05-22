@@ -7,7 +7,6 @@ from time import sleep
 from logging import info, basicConfig, INFO
 
 # Custom imports
-from classes.Util import WhatTheFuckDidYouDo
 from classes.UI import UI
 from classes.PeriodicScraper import PeriodicScraper
 from classes.Scraper import Scraper
@@ -31,6 +30,7 @@ conf_path = os.path.join(base_dir, "config.ini")
 config.read(conf_path)
 URL = config["DEFAULT"]["URL"] 
 
+Notify(base_dir=base_dir, exit_after=True).notification("Starting custoMM...")
 
 # Test connection to server
 try:
@@ -39,14 +39,14 @@ try:
 except Exception:
     # NEVER DO THIS
     # although, what could go wrong...
-    Notify(base_dir=base_dir, exit_after=True).notification("Server seems to be down, please contact admin if it keeps doing this")
+    Notify(base_dir=base_dir, exit_after=True).notification("Server seems to be down, please contact admin if it keeps doing this.")
     sys.exit()
 
 # Get current summoner
 def main():
     # Match scraping
     # Periodic scraper
-    periodic = PeriodicScraper(config=config, base_dir=base_dir)
+    periodic = PeriodicScraper(config=config, base_dir=base_dir, offset=30)
     
     ui = UI(scraper=periodic.connector, periodic=periodic, base_dir=base_dir)
     # Self update only needs to run once, on start of program

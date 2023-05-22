@@ -1,18 +1,26 @@
+# League of Legends Client API Wrapper
 from lcu_connector import Connector
 from lcu_connector.exceptions import ClientProcessError, MissingLockfileError
+
+# Logging
 from logging import info, error
+# Requests
 from requests import get,put,post,delete
 from requests.exceptions import ConnectionError
-import sys
-from time import sleep
-from json import dumps
-from configparser import ConfigParser
-from .Util import WhatTheFuckDidYouDo
+
+# Custom imports
+from .Exceptions import WhatTheFuckDidYouDo
 from .Game import Game
 from .Notify import Notify
 
+# Config
+from configparser import ConfigParser
+
+from time import sleep
+from json import dumps
+
 TIME_DELAY = 20
-GAMES_TO_SCRAPE = 100000
+GAMES_TO_SCRAPE = 1000
 
 class Scraper:
     """ Scraper
@@ -53,7 +61,7 @@ class Scraper:
                 if notification.exit:
                     return False
                 info("Polling...")
-                notification.notification("League client has not been opened yet.")
+                notification.notification("custoMM is waiting for LoL to start in the background.")
                 notification.notified = True
                 sleep(TIME_DELAY)
           
