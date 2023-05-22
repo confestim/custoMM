@@ -7,8 +7,8 @@ router.register(r'players', views.PlayerViewSet)
 router.register(r'current', views.CurrentViewSet)
 
 urlpatterns = [
-    path('api/', include(router.urls)),
-    path('api/games/', views.games),
-    path('api/game/', views.game),
+    path('', include(router.urls)),
+    path('games/', views.games),
+    path('game/', views.game),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

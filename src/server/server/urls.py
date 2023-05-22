@@ -18,6 +18,7 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('server_client_api.urls')),
+    path('api/', include('server_client_api.urls')),
+    path('', include('leaderboard.urls'))
     # TODO: Add matchup calculation page.
 ]
