@@ -1,8 +1,50 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 .container {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     height: 100vh;
-    background-color: gray;
+
+}
+
+.body {
+  /* Roboto for all text */
+  font-family: 'Roboto', sans-serif;
+
+}
+
+ @-webkit-keyframes color-change-2x {
+  0% {
+    background: #2e3030;
+  }
+  100% {
+    background: #5f6b32;
+  }
+}
+@keyframes color-change-2x {
+  0% {
+    background: #2e3030;
+  }
+  100% {
+    background: #5f6b32;
+  }
+}
+
+.color-change-2x {
+	-webkit-animation: color-change-2x 10s cubic-bezier(0.550, 0.085, 0.680, 0.530) infinite alternate both;
+	        animation: color-change-2x 10s cubic-bezier(0.550, 0.085, 0.680, 0.530) infinite alternate both;
+}
+
+#logo{
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
 }

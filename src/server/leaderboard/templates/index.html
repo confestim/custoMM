@@ -1,29 +1,11 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1>Leaderboard</h1>
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Username</th>
-                            <th>Score</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                            <tr>
-                                <td>{{ user.rank }}</td>
-                                <td>{{ user.username }}</td>
-                                <td>{{ user.score }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+<div class="logo flicker-in">
+  <a href="https://github.com/confestim/custoMM"><img src="{% static 'customm.png' %}" alt="customm logo"></a>
+</div>
+
+<h1 class= "flicker-in" style="animation-delay:1s;">Work in progress...</h1>
 {% endblock %}
