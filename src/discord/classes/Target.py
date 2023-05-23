@@ -13,6 +13,7 @@ class Target:
         self.URL = config["DEFAULT"]["URL"]
         self.team_1 = config['DISCORD']['TEAM_1']
         self.team_2 = config['DISCORD']['TEAM_2']
+        print(self.team_1, self.team_2)
         self.token = config['DISCORD']['TOKEN']
         self.ctx = ctx
         self.bot = bot
