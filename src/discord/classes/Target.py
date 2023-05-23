@@ -17,7 +17,7 @@ class Target:
         self.ctx = ctx
         self.bot = bot
 
-    async def ready(self) -> bool:
+    async def ready(self):
         """
         Checks if players are ready to be split
         """
@@ -65,11 +65,12 @@ class Target:
         # Splitting logic
         for i in range(5):
             print(players_1[i])
-            await players_1[i].move_to(team_1)
+            # await players_1[i].move_to(team_1)
             one_em.add_field(name=players_1[i].name, value=f"<@{players_2[i].id}>")
-            await players_2[i].move_to(team_2)
+            print(players_2[i])
+            # await players_2[i].move_to(team_2)
             two_em.add_field(name=players_2[i].name, value=f"<@{players_2[i].id}>")
-
+       
         # Sending embeds and cleanup
         await self.ctx.send(embed=one_em)
         await self.ctx.send(embed=two_em)
