@@ -44,7 +44,7 @@ class Target:
         
         return players     
       
-    async def split(self, players_1, players_2, fair):
+    async def split(self, players_1, players_2, fair=False):
         """
         Splits players into 2 teams
         """
