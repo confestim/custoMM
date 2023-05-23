@@ -51,8 +51,9 @@ class Target:
         await self.ctx.send(self.bot)
         # Declaring channels
         team_1 = await self.bot.get_channel(self.team_1)
+    
         team_2 = await self.bot.get_channel(self.team_2)
-        
+        await self.ctx.send(team_1, team_2)    
         # Embedding
         one_em = discord.Embed(title=f"Team 1", colour=discord.Colour(0x8c0303))
         two_em = discord.Embed(title=f"Team 2", colour=discord.Colour(0x0B5394))
