@@ -15,7 +15,6 @@ class Target:
         self.team_2 = config['DISCORD']['TEAM_2']
         self.token = config['DISCORD']['TOKEN']
         self.ctx = ctx
-        self.ctx.send(bot)
         self.bot = bot
 
     async def ready(self) -> bool:
@@ -49,7 +48,7 @@ class Target:
         """
         Splits players into 2 teams
         """
-        await self.ctx.send(fair)
+        await self.ctx.send(self.bot)
         # Declaring channels
         team_1 = await self.bot.get_channel(self.team_1)
         team_2 = await self.bot.get_channel(self.team_2)
