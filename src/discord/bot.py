@@ -23,7 +23,7 @@ async def on_ready():
 @bot.command(aliases=['random'])
 async def randomize(ctx):
     """Randomizes 10 people into 2 teams: !randomize"""
-    target = Target(ctx, bot)
+    target = Target(ctx, bot=bot)
     await target.randomize()
     return
 
@@ -31,7 +31,7 @@ async def randomize(ctx):
 @bot.command(aliases=['begin_game', 'game'])
 async def ladder(ctx):
     """Tries to start a fair game: !ladder"""
-    target = Target(ctx, bot)
+    target = Target(ctx, bot=bot)
 
     players = await target.ready()
     if not players:
@@ -87,7 +87,7 @@ async def ladder(ctx):
 @bot.command(aliases=['r', 'reg'])
 async def register(ctx, *args):
     """Registers a user to the database: !register <league_name>"""
-    target = Target(ctx, bot)
+    target = Target(ctx, bot=bot)
     name = " ".join(args)
 
     if (len(name) < 4) or (requests.get(f"https://lolprofile.net/summoner/eune/{name}").status_code != 200):

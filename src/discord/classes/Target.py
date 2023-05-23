@@ -21,7 +21,7 @@ class Target:
         """
         Checks if players are ready to be split
         """
-        self.trying_prompt = await self.ctx.send('Trying to start fair game!')
+        self.trying_prompt = await self.ctx.send('Trying to start!')
 
         # Fetching user channel
         try:
