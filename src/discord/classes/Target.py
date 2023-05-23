@@ -85,7 +85,7 @@ class Target:
             return False
         
         random.shuffle(players)
-        print(players[:int(len(players)/2)], players[int(len(players)/2):])
+        print([x.name for x in players[:int(len(players)/2)]], [x.name for x in players[:int(len(players)/2)]:])
         await self.split(players[:int(len(players)/2)], players[int(len(players)/2):])
         return True
         
