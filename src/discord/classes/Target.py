@@ -15,6 +15,7 @@ class Target:
         self.team_2 = config['DISCORD']['TEAM_2']
         self.token = config['DISCORD']['TOKEN']
         self.ctx = ctx
+        self.ctx.send(bot)
         self.bot = bot
 
     async def ready(self) -> bool:
