@@ -11,8 +11,8 @@ class Target:
         config = configparser.ConfigParser()
         config.read("../config.ini")
         self.URL = config["DEFAULT"]["URL"]
-        self.team_1 = str(config['DISCORD']['TEAM_1'])
-        self.team_2 = str(config['DISCORD']['TEAM_2'])
+        self.team_1 = int(config['DISCORD']['TEAM_1'])
+        self.team_2 = int(config['DISCORD']['TEAM_2'])
         self.token = config['DISCORD']['TOKEN']
         self.ctx = ctx
         self.bot = bot
