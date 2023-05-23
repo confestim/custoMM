@@ -20,3 +20,4 @@ main.spec
 # LCU_connector leftover
 riotgames.pem
 test.py
+src/client/custoMM_installer.exe

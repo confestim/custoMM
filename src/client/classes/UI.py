@@ -60,8 +60,8 @@ class UI():
         # TODO: Test this
         update = SelfUpdate(base_dir=self.base_dir, version=self.version)
         if update:
-            prompt = pyautogui.confirm(f"New version available, do you want to update?")
-            if prompt:
+            prompt = pyautogui.confirm(f"New version available, do you want to update?", buttons=['OK', 'No'])
+            if prompt == "OK":
                 update.update()
             else:
                 self.icon.notify("Please update as soon as possible.", "New version available.")

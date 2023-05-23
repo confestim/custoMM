@@ -83,6 +83,6 @@ class Target:
         
         random.shuffle(players)
 
-        self.split(players[:int(len(players)/2)], players[int(len(players)/2):])
+        await self.split(players[:int(len(players)/2)], players[int(len(players)/2):])
         return True
         

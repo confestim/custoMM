@@ -1,7 +1,7 @@
 from requests import get, put, post, delete
 from wget import download
 from os import system, path
-
+from logging import info
 
 class SelfUpdate():
     """Checks for new updates and prompts user to install
@@ -14,6 +14,7 @@ class SelfUpdate():
         
         self.version = version
         self.newest = get("https://api.github.com/repos/confestim/custoMM/releases/latest").json()["tag_name"]
+        info(self.newest, self.version)
         self.new_version = False
         if self.version != self.newest:
             self.new_version = True
