@@ -48,7 +48,7 @@ class Target:
         """
         Splits players into 2 teams
         """
-
+        await self.ctx.send(fair)
         # Declaring channels
         team_1 = await self.bot.get_channel(self.team_1)
         team_2 = await self.bot.get_channel(self.team_2)
