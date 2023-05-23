@@ -71,6 +71,7 @@ class Target:
             # await players_2[i].move_to(team_2)
             two_em.add_field(name=players_2[i].name, value=f"<@{players_2[i].id}>")
        
+       
         # Sending embeds and cleanup
         await self.ctx.send(embed=one_em)
         await self.ctx.send(embed=two_em)
@@ -79,11 +80,12 @@ class Target:
     
     async def randomize(self):
         players = await self.ready()
+        print(players)
         if not players:
             return False
         
         random.shuffle(players)
-
+        print(players[:int(len(players)/2)], players[int(len(players)/2):])
         await self.split(players[:int(len(players)/2)], players[int(len(players)/2):])
         return True
         
