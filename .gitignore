@@ -1,5 +1,6 @@
 # Config
 src/config.ini
+src/discord/config.ini
 
 # Environment
 .env/
@@ -13,6 +14,7 @@ migrations/
 build/
 dist/
 main.spec
+src/client/custoMM_installer.exe
 
 # VSCode garbage
 .vscode/
@@ -20,4 +22,3 @@ main.spec
 # LCU_connector leftover
 riotgames.pem
 test.py
-src/client/custoMM_installer.exe

@@ -5,6 +5,7 @@ from logging import info
 from sys import exit
 from configparser import ConfigParser
 
+
 class PeriodicScraper(Thread):
     """Scraper that runs every `offset` seconds
 

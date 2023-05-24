@@ -1,46 +1,55 @@
-import configparser
+from .Config import Config
 import discord
 from discord.ext import commands
 import asyncio
 from typing import List
 import random
 
-class Target:
-    def __init__(self, ctx, bot:commands.Bot):
-      
-        config = configparser.ConfigParser()
-        config.read("../config.ini")
-        self.URL = config["DEFAULT"]["URL"]
-        self.team_1 = int(config['DISCORD']['TEAM_1'])
-        self.team_2 = int(config['DISCORD']['TEAM_2'])
-        self.token = config['DISCORD']['TOKEN']
+class Splitter:
+    def __init__(self, 
+                 bot:commands.Bot, 
+                 author:discord.Member,
+                 ctx:commands.Context=None, 
+                 interaction:discord.Interaction=None,
+                 slash=False):
+        # Config
         self.ctx = ctx
+        self.interaction = interaction
+        self.config = Config()
         self.bot = bot
-        print(self.bot.get_channel(self.team_1), self.team_2)
+        self.author = author
+        self.slash = slash
+        self.responses = 0
 
+    async def send(self, message):
+        if not self.slash and self.ctx is not None:
+            return await self.ctx.send(message)
+        self.responses += 1
+        if self.responses > 1:
+            return await self.interaction.followup.send(message)
+        return await self.interaction.response.send_message(message)
+    
     async def ready(self):
+
         """
         Checks if players are ready to be split
         """
-        self.trying_prompt = await self.ctx.send('Trying to start!')
 
         # Fetching user channel
         try:
-            channel = self.bot.get_channel(self.ctx.author.voice.channel.id)
+            channel = self.bot.get_channel(self.author.voice.channel.id)
         except AttributeError:
-            await self.trying_prompt.delete()
-            await self.ctx.send("You think you're cool or something? Get in a channel first.")
+            await self.send("You think you're cool or something? Get in a channel first.")
             return False
 
         players = channel.members
         if len(players) < 10:
-            await self.trying_prompt.delete()
-            await self.ctx.send(f"Get more people in ({len(players)}/10)")
+            await self.send(f"Get more people in ({len(players)}/10)")
             return False
 
         if len(players) % 10 != 0:
         # If total players not divisible by 10, can't split
-            await self.ctx.send("Can't split(remove bots and non-players)")
+            await self.send("Can't split(remove bots and non-players)")
             return False
         
         return players     
@@ -49,10 +58,9 @@ class Target:
         """
         Splits players into 2 teams
         """
-        await self.ctx.send(self.bot)
         # Declaring channels
-        team_1 = discord.utils.get(self.team_1)
-        team_2 = discord.utils.get(self.team_2)
+        team_1 = discord.utils.get(self.config.team_1)
+        team_2 = discord.utils.get(self.config.team_2)
         print(team_1, team_2)
         # Embedding
         one_em = discord.Embed(title=f"Team 1", colour=discord.Colour(0x8c0303))
@@ -74,19 +82,10 @@ class Target:
        
        
         # Sending embeds and cleanup
-        await self.ctx.send(embed=one_em)
-        await self.ctx.send(embed=two_em)
-        await self.trying_prompt.delete()
-        return
+        await self.send(embed=one_em)
+        await self.send(embed=two_em)
+        return 
     
-    async def randomize(self):
-        players = await self.ready()
-        print(players)
-        if not players:
-            return False
-        
-        random.shuffle(players)
-        print([x.name for x in players[:int(len(players)/2)]], [x.name for x in players[int(len(players)/2):]])
-        await self.split(players[:int(len(players)/2)], players[int(len(players)/2):])
-        return True
+    
+
         
