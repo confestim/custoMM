@@ -21,13 +21,13 @@ class Splitter:
         self.slash = slash
         self.responses = 0
 
-    async def send(self, message):
+    async def send(self, message, embed=None):
         if not self.slash and self.ctx is not None:
-            return await self.ctx.send(message)
+            return await self.ctx.send(message, embed=embed)
         self.responses += 1
         if self.responses > 1:
-            return await self.interaction.followup.send(message)
-        return await self.interaction.response.send_message(message)
+            return await self.interaction.followup.send(message, embed=embed)
+        return await self.interaction.response.send_message(message, embed=embed)
     
     async def ready(self):
 

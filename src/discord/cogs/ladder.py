@@ -7,12 +7,13 @@ class LadderCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
+    # !Command
     @commands.command(aliases=['begin_game', 'game'])
     async def ladder(self, ctx):
         fair = Fair(bot=self.bot, author=ctx.author, ctx=ctx)
         await fair.divide()
 
-    
+    # /Command
     @app_commands.command(name="ladder", description="Tries to start a fair game")
     async def ladder(self, interaction: Interaction):
         fair = Fair(bot=self.bot, author=interaction.user, interaction=interaction, slash=True)
