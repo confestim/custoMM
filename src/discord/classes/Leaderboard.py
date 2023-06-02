@@ -10,6 +10,7 @@ class Leaderboard(Splitter):
         # Inherits send function from Splitter
         super().__init__(bot, author, ctx, interaction, slash)
         self.players = players
+        
     async def leaderboard(self):
         """Shows the Top <players> leaderboard: !leaderboard <number_of_players> <max>"""
         config = Config()

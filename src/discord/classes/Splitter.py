@@ -54,23 +54,22 @@ class Splitter:
         
         return players     
       
-    async def split(self, players_1, players_2, fair=False):
+    async def split(self, players_1, players_2):
         """
         Splits players into 2 teams
         """
+        # BUG HERE
+        # TODO: FIGURE IT OUT
+
         # Declaring channels
-        team_1 = discord.utils.get(self.config.team_1)
-        team_2 = discord.utils.get(self.config.team_2)
+        team_1 = self.bot.get_channel(str(self.config.team_1))
+        team_2 = self.bot.get_channel(self.config.team_2)
         print(team_1, team_2)
         # Embedding
         one_em = discord.Embed(title=f"Team 1", colour=discord.Colour(0x8c0303))
         two_em = discord.Embed(title=f"Team 2", colour=discord.Colour(0x0B5394))
         
-        # Format if fair
-        if fair:
-            players_1 = [await self.bot.fetch_user(x["discord_id"]) for x in players_1]
-            players_2 = [await self.bot.fetch_user(x["discord_id"]) for x in players_2]
-
+  
         # Splitting logic
         for i in range(5):
             print(players_1[i])

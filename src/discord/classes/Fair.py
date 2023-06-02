@@ -54,8 +54,11 @@ class Fair(Splitter):
         teams = teams.json()
         # TODO: Debug, remove
         print(teams)
-        
-        await self.split(teams[0], teams[1], fair=True)
+
+        players_1 = [await self.bot.fetch_user(x["discord_id"]) for x in teams[0]]
+        players_2 = [await self.bot.fetch_user(x["discord_id"]) for x in teams[1]]
+
+        await self.split(players_1, players_2)
 
         # Create current game
         requests.post(f"{self.config.URL}/current/", data={
