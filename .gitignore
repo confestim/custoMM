@@ -1,6 +1,5 @@
 # Config
-src/config.ini
-src/discord/config.ini
+config.ini
 
 # Environment
 .env/
