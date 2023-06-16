@@ -1,16 +1,16 @@
 from .Config import Config
-import discord
-from discord.ext import commands
-import asyncio
+from discord import Member, Interaction, Embed, Colour
+from discord.ext.commands import Bot, Context
 from typing import List
 import random
 
+
 class Splitter:
     def __init__(self, 
-                 bot:commands.Bot, 
-                 author:discord.Member,
-                 ctx:commands.Context=None, 
-                 interaction:discord.Interaction=None,
+                 bot:Bot, 
+                 author:Member,
+                 ctx:Context=None, 
+                 interaction:Interaction=None,
                  slash=False):
         # Config
         self.ctx = ctx
@@ -22,9 +22,11 @@ class Splitter:
         self.responses = 0
         team_1 = self.bot.get_channel(self.config.team_1)
         team_2 = self.bot.get_channel(self.config.team_2)
-        print(team_1, team_2)
-
+        
     async def send(self, message, embed=None):
+        """ 
+        Sends a message. Method depends on if the slash command or the prefix command was used.
+        """
         if not self.slash and self.ctx is not None:
             return await self.ctx.send(message, embed=embed)
         self.responses += 1
@@ -65,18 +67,16 @@ class Splitter:
         # Declaring channels
         team_1 = self.bot.get_channel(self.config.team_1)
         team_2 = self.bot.get_channel(self.config.team_2)
-        print(team_1, team_2)
         # Embedding
-        one_em = discord.Embed(title=f"Team 1", colour=discord.Colour(0x8c0303))
-        two_em = discord.Embed(title=f"Team 2", colour=discord.Colour(0x0B5394))
+        one_em = Embed(title=f"Team 1", colour=Colour(0x8c0303))
+        two_em = Embed(title=f"Team 2", colour=Colour(0x0B5394))
         
   
         # Splitting logic
         for i in range(5):
-            print(players_1[i])
             await players_1[i].move_to(team_1)
             one_em.add_field(name=players_1[i].name, value=f"<@{players_1[i].id}>")
-            print(players_2[i])
+
             await players_2[i].move_to(team_2)
             two_em.add_field(name=players_2[i].name, value=f"<@{players_2[i].id}>")
        
