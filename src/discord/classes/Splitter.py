@@ -20,6 +20,9 @@ class Splitter:
         self.author = author
         self.slash = slash
         self.responses = 0
+        team_1 = self.bot.get_channel(self.config.team_1)
+        team_2 = self.bot.get_channel(self.config.team_2)
+        print(team_1, team_2)
 
     async def send(self, message, embed=None):
         if not self.slash and self.ctx is not None:
@@ -58,11 +61,9 @@ class Splitter:
         """
         Splits players into 2 teams
         """
-        # BUG HERE
-        # TODO: FIGURE IT OUT
 
         # Declaring channels
-        team_1 = self.bot.get_channel(str(self.config.team_1))
+        team_1 = self.bot.get_channel(self.config.team_1)
         team_2 = self.bot.get_channel(self.config.team_2)
         print(team_1, team_2)
         # Embedding
@@ -73,16 +74,16 @@ class Splitter:
         # Splitting logic
         for i in range(5):
             print(players_1[i])
-            # await players_1[i].move_to(team_1)
-            one_em.add_field(name=players_1[i].name, value=f"<@{players_2[i].id}>")
+            await players_1[i].move_to(team_1)
+            one_em.add_field(name=players_1[i].name, value=f"<@{players_1[i].id}>")
             print(players_2[i])
-            # await players_2[i].move_to(team_2)
+            await players_2[i].move_to(team_2)
             two_em.add_field(name=players_2[i].name, value=f"<@{players_2[i].id}>")
        
        
         # Sending embeds and cleanup
-        await self.send(embed=one_em)
-        await self.send(embed=two_em)
+        await self.send(embed=one_em, message=None)
+        await self.send(embed=two_em, message=None)
         return 
     
     
