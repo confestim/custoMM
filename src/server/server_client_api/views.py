@@ -1,18 +1,13 @@
 from rest_framework import viewsets, filters, mixins
 from rest_framework.response import Response
-from .serializers import PlayerSerializer, GameSerializer, CurrentSerializer
-from .models import Player, Game, Current
+from .serializers import PlayerSerializer, GameSerializer, CurrentSerializer, InstructionsSerializer
+from .models import Player, Game, Current, Instructions
 
 import math
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-class WhatTheFuckDidYouDo(Exception):
-    # We raise this when we don't know what the fuck happened
-    def __init__(self, message="Congrats, you broke this program, please explain your steps as an issue at https://github.com/confestim/custoMM"):
-        self.message = message
-        super().__init__(self.message)
 
 class PlayerViewSet(viewsets.ModelViewSet):
     """
@@ -58,7 +53,50 @@ class CurrentViewSet(viewsets.ModelViewSet):
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+@api_view(['GET', 'POST'])
+def instructions(request):
+    # TODO: Implement
+    """
+    Instructions for every player during the game.
+    This a troll function, it should be disabled in the client if you don't want it.
+    """
+
+    possible_instructions = [
+        "troll", # (everybody flashes at the same time)
+        "emote", # (everybody spams emotes)
+        "skin", # (everybody writes their skin)
+        "summoner", # (everybody writes their summoner name)
+        "dance", # (everybody dances)
+        "laugh", # (everybody laughs)
+        "joke", # (everybody tells a joke)
+        "taunt", # (everybody taunts)
+        "recall", # (everybody recalls)
+        ]
+    if request.method == 'GET':
+        instructions = Instructions.objects.all()
+        serializer = InstructionsSerializer(instructions, many=True)
+        return Response(serializer.data)
     
+    if request.method == 'POST':
+        if request.data.get("game_id") is None:
+            return Response("No game id provided.", status=status.HTTP_400_BAD_REQUEST)
+        if request.data.get("instructions") is None or request.data.get("user") is None:
+            return Response("No instructions provided.", status=status.HTTP_400_BAD_REQUEST)
+        if request.data.get("instructions") not in possible_instructions or request.data.get("user") not in Player.objects.all():
+            return Response("Invalid instruction.", status=status.HTTP_400_BAD_REQUEST)
+        instructions, created = Instructions.objects.get_or_create(game_id=request.data.get("game_id"))
+        if not created:
+            # Add to json field
+            instructions.instructions[request.data.get("user")].append(request.data.get("instructions"))
+            instructions.save()
+            return Response("Added.", status=status.HTTP_201_CREATED)
+        else:
+            # Create json field
+            instructions.instructions = {request.data.get("user"): [request.data.get("instructions")]}
+            instructions.save()
+            return Response("Added.", status=status.HTTP_201_CREATED)
+        
+
 @api_view(['GET', 'POST'])
 def games(request):
     """
@@ -174,7 +212,7 @@ def mmr_on_game(ign:str, avg_enemy_mmr:int, kda:float, outcome:bool):
     
     # I feel like this could bug out(magically), so raise exception if neither of these is the case
     else:
-        raise WhatTheFuckDidYouDo()
+        raise Exception()
         
     # Save to player
     player.mmr = mmr_change

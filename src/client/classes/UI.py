@@ -97,7 +97,7 @@ class UI():
 
         elif check[0] == "REGISTRATION_IN_PROGRESS":
             prompt = pyautogui.confirm(f"Your account({check[1]['lol']}) is currently being registered by {check[1]['discord']} on Discord. Is this you?")
-            if prompt:
+            if prompt == "OK":
                 self.scraper.register_summoner(True, check[1])
             else:
                 self.scraper.register_summoner(False, check[1])

@@ -34,12 +34,15 @@ Notify(base_dir=base_dir, exit_after=True).notification("Starting custoMM...")
 
 # Test connection to server
 try:
-    test = requests.get(URL).json()
+    test = requests.get(URL).raise_for_status()
 
-except Exception:
+except (requests.exceptions.ConnectionError, requests.exceptions.Timeout):
     # NEVER DO THIS
     # although, what could go wrong...
-    Notify(base_dir=base_dir, exit_after=True).notification("Server seems to be down, please contact admin if it keeps doing this.")
+    Notify(base_dir=base_dir, exit_after=True).notification("custoMM unavailable", "Try restarting and contact admin if it keeps doing this.")
+    sys.exit()
+except requests.exceptions.HTTPError as error:
+    Notify(base_dir=base_dir, exit_after=True).notification(f"Server issue", "Contact admin immediately. Error code: {error.response.status_code}")
     sys.exit()
 
 # Get current summoner

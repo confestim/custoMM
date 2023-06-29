@@ -81,3 +81,4 @@ class Game:
         cfg = self.connection.get("/lol-lobby/v2/lobby").json()["gameConfig"]
         return [[x["summonerInternalName"] for x in cfg["customTeam100"]],
                 [x["summonerInternalName"] for x in cfg["customTeam200"]]]
+        

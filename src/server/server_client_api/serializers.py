@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Player, Game, Current
+from .models import Player, Game, Current, Instructions
 
 
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
@@ -17,6 +17,12 @@ class PlayerSerializer(serializers.HyperlinkedModelSerializer):
         instance.save()
         return instance
 
+
+class InstructionsSerializer(serializers.ModelSerializer):
+    
+        class Meta:
+            model = Instructions
+            fields = ("game_id", "instructions")
 
 class GameSerializer(serializers.ModelSerializer):
 

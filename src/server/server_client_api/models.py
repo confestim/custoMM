@@ -11,9 +11,16 @@ class Player(models.Model):
     def __str__(self):
         return f"{self.discord}:{self.lol}"
 
+class Instructions(models.Model):
+    game_id = models.CharField(max_length=30, unique=True)
+    instructions = models.JSONField(default=dict)
+
 class Stats(models.Model):
     """LoL stats for each Player"""
     
+    # TODO: Implement in views, serializers and client
+
+
     # Roles
     JUNGLE = "JGL"
     TOP = "TOP"

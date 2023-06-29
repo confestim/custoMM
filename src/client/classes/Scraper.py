@@ -9,7 +9,7 @@ from requests import get,put,post,delete
 from requests.exceptions import ConnectionError
 
 # Custom imports
-from .Exceptions import WhatTheFuckDidYouDo
+from .Exceptions import RegistrationError
 from .Game import Game
 from .Notify import Notify
 
@@ -196,7 +196,7 @@ class Scraper:
                 
             # All cases are covered, everything else will be considered a bug.
             else:
-                raise WhatTheFuckDidYouDo()
+                raise RegistrationError()
 
     def move_needed(self, checker, game:Game, name:str):
         """ Moves player into other team if needed
