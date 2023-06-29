@@ -1,6 +1,7 @@
 # League of Legends Client API Wrapper
 from lcu_connector import Connector
 from lcu_connector.exceptions import ClientProcessError, MissingLockfileError
+# TODO: Bug when trying to access previous lockfile
 
 # Logging
 from logging import info, error
