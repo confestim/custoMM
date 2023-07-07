@@ -6,7 +6,7 @@ from .models import Player, Game, Current, Instructions
 class PlayerSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Player
-        fields = ('discord', 'lol', 'lol_id', 'discord_id', 'mmr')
+        fields = ('discord', 'lol', 'lol_id', 'discord_id', 'mmr', 'usual_role', 'roles')
 
     def update(self, instance, validated_data):
         instance.discord_id = validated_data.get(
@@ -34,7 +34,7 @@ class CurrentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Current
-        fields = ("lobby_name", "creator", "players", "teams")
+        fields = ("lobby_name", "creator", "players", "teams", "bravery")
 
     def create(self, validated_data):
         """

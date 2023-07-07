@@ -8,9 +8,19 @@ from random import choice
 from json import dumps
 
 class Fair(Splitter):
-    def __init__(self, bot,author:discord.Member, ctx:commands.Context=None, interaction:discord.Interaction=None, slash=False):
+    def __init__(self, 
+                bot,
+                author:discord.Member, 
+                ctx:commands.Context=None, 
+                interaction:discord.Interaction=None, 
+                slash=False, 
+                bravery=False):
+
+        
         super().__init__(bot, author, ctx, interaction, slash)
         
+        self.bravery = bravery
+
         if slash:
           splitter = Splitter(bot=bot, author =author, interaction=interaction, slash=True)
         else:
@@ -65,7 +75,8 @@ class Fair(Splitter):
             "lobby_name": None,
             "players": 0,
             "creator": choice(valid_players),
-            "teams": dumps(teams)
+            "teams": dumps(teams),
+            "bravery": True if self.bravery else False
         })
 
 

@@ -8,6 +8,9 @@ class Game:
         # Loop until we get connection
         self.connection = connection
 
+
+
+
     def list_all(self):
         # List all games
         sleep(1)
@@ -48,7 +51,22 @@ class Game:
         members = [x["summonerName"] for x in self.connection.get("/lol-lobby/v2/lobby/").json()["members"]]
         if creator not in members:
             self.leave()
-        
+    
+    def wait_for_champ_select(self):
+        select = self.connection.get("/lol-champ-select/v1/session").json()
+        in_champ_select = False
+        while not in_champ_select:
+            try:
+                select["isCustomGame"]
+            except KeyError:
+                select = self.connection.get("/lol-champ-select/v1/session").json()
+                self.leave_with_creator()
+                sleep(1)
+            else:
+                in_champ_select = True
+        return select
+
+
     def create(self):
         # Creates game
         conn = self.connection

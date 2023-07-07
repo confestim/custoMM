@@ -21,22 +21,6 @@ class Stats(models.Model):
     # TODO: Implement in views, serializers and client
 
 
-    # Roles
-    JUNGLE = "JGL"
-    TOP = "TOP"
-    MID = "MID"
-    ADC = "ADC"
-    SUPPORT = "SUP"
-    FILL = "FILL"
-
-    ROLE_CHOICES = [
-        (JUNGLE, "Jungle"),
-        (TOP, "Top"),
-        (MID, "Middle"),
-        (ADC, "Carry"),
-        (SUPPORT, "Support"),
-        (FILL, "Fill")
-    ]
     
     # Player, associated with Player model
     player = models.ForeignKey(Player, on_delete=models.CASCADE)
@@ -47,7 +31,8 @@ class Stats(models.Model):
     kp = models.FloatField(default=0)
     games_played = models.IntegerField(default=0)
     roles = models.JSONField(default=dict)
-    usual_role = models.CharField(max_length=30, default=FILL, choices=ROLE_CHOICES)
+    # {"TOP":0, "JUNGLE":0, "MIDDLE":0, "ADC":0, "SUPPORT":0, "OTHER":0}
+    usual_role = models.CharField(max_length=30, default="FILL")
     def __str__(self):
         return f"{self.player} - KDA:{self.kda}, Gold:{self.gold}, KP:{self.kp}"
 
@@ -62,6 +47,7 @@ class Current(models.Model):
     players = models.IntegerField(default=0)
     creator = models.CharField(max_length=30, unique=True, primary_key=True,)
     teams = models.JSONField(default=dict)
+    bravery = models.JSONField()
 
     def __str__(self):
         return str(self.lobby_name)

@@ -13,6 +13,7 @@ from requests.exceptions import ConnectionError
 from .Exceptions import RegistrationError
 from .Game import Game
 from .Notify import Notify
+from .UltimateBravery import UltimateBravery
 
 # Config
 from configparser import ConfigParser
@@ -23,6 +24,21 @@ from json import dumps
 TIME_DELAY = 20
 GAMES_TO_SCRAPE = 1000
 
+JUNGLE = "JGL"
+TOP = "TOP"
+MID = "MID"
+ADC = "ADC"
+SUPPORT = "SUP"
+FILL = "FILL"
+ 
+ROLE_CHOICES = [
+        (JUNGLE, "Jungle"),
+        (TOP, "Top"),
+        (MID, "Middle"),
+        (ADC, "Carry"),
+        (SUPPORT, "Support"),
+        (FILL, "Fill")
+    ]
 class Scraper:
     """ Scraper
 
@@ -122,14 +138,18 @@ class Scraper:
                 
                 # Sloppy solution, find fix.
                 for player in range(10):
-                    current_player = match["participants"][player]["stats"]
-                    kills = current_player["kills"]
-                    assists = current_player["assists"]
-                    deaths = current_player["deaths"]
-                    if player <= 5:
-                        parsed_match["participants"]["t1"]["summoners"].append({"name":match["participantIdentities"][player]["player"]["summonerName"], "kda": self.calculate_kda(kills, assists, deaths)})
-                    else:
-                        parsed_match["participants"]["t2"]["summoners"].append({"name":match["participantIdentities"][player]["player"]["summonerName"], "kda": self.calculate_kda(kills, assists, deaths)})
+                    current_player = match["participants"][player]
+                    stats = current_player["stats"]
+                    lane = current_player["timeline"]["lane"]
+                    role = current_player["timeline"]["lane"]
+
+                    kda = self.calculate_kda(stats["kills"],stats["assists"],stats["deaths"])
+                    current_player[""]
+                    
+                    parsed_match["participants"]["t1" if player<=5 else "t2"]["summoners"].append({"name":match["participantIdentities"][player]["player"]["summonerName"], 
+                                                                                                    "kda": kda,
+                                                                                                    "lane":lane,
+                                                                                                    "role":role})
                 parsed_matches.append(parsed_match)
         if not new:
             # Notify player that we're up to date
@@ -265,21 +285,17 @@ class Scraper:
         # Local game instance
         game = Game(connection=self.connection, config=self.config)
         
-        # Check if inside the game already
-        if game.in_game_with_name(checker["lobby_name"]):
-            game.leave_with_creator(checker["creator"])
-            return "JOINED"
-        
         # If you are the creator, create the game and disclose its name to the server
         if checker["creator"] == self.name:
             Notify(base_dir=self.base_dir, exit_after=True).notification("You are the creator! Creating lobby...")
             created = game.create() 
-            # TODO: DEBUG
+
             r = put(f"{self.URL}/current/{self.name}/", data={
                 "lobby_name": created,
                 "creator": self.name,
                 "players": 1,
-                "teams": dumps(checker["teams"], indent=4)
+                "teams": dumps(checker["teams"], indent=4),
+                "bravery": checker["bravery"]
                 })
             
 
@@ -308,10 +324,21 @@ class Scraper:
                 "lobby_name": checker["lobby_name"],
                 "creator": name,
                 "players": int(checker["players"])+1,
-                "teams": dumps(checker["teams"], indent=4)
+                "teams": dumps(checker["teams"], indent=4),
+                "bravery": checker["bravery"]
 
             })
-            return "JOINED" 
+            game.wait_for_champ_select()
+            if checker["bravery"]:
+                self.__pick_bravely(checker["bravery"][self.name])
+
+
+    def __pick_bravely(self, data):
+        role = get(f"{self.URL}/players/?search={self.summoner['displayName']}").json()[0]["usual_role"]
+        brave = UltimateBravery()
+        # TODO: 
+        # * Automatic picking of champ, runes and spells
+
         
  
     def scrape(self):

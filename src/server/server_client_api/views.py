@@ -258,7 +258,31 @@ def average_mmr(game):
 
     return sum(winners)/5, sum(losers)/5
     
+def update_roles(gamer, role, lane):
+    try:
+        player = Player.objects.get(lol=gamer)
+    except Player.DoesNotExist:
+        player = Player.objects.create(lol=gamer)
 
+    if lane == "TOP":
+        player.roles["TOP"] += 1
+    elif lane == "JUNGLE":
+        player.roles["JUNGLE"] += 1
+    elif lane == "MIDDLE":
+        player.roles["MIDDLE"] += 1
+    elif lane == "BOTTOM" and role == "CARRY":
+        player.roles["ADC"] += 1
+    elif lane == "BOTTOM" and role == "SUPPORT":
+        player.roles["SUPPORT"]
+    else:
+        player.roles["OTHER"] += 1
+
+    most_played = max(player.roles, key=lambda x: player.roles[x])
+    if most_played != player.usual_role:
+        player.usual_role = most_played
+        
+    player.save()
+    
 def parse_game(game):
     """
     Parse game function
@@ -276,6 +300,7 @@ def parse_game(game):
     for player in teams["t1"]["summoners"]:
         print(player)
         mmr_on_game(player["name"], average, player["kda"], win_loss)
+        update_roles(player["name"], player["role"],player["lane"])
     
     
     win_loss = not win_loss
@@ -284,7 +309,8 @@ def parse_game(game):
     for player in teams["t2"]["summoners"]:
         print(player)
         mmr_on_game(player["name"], average, player["kda"], win_loss)
-    
+        update_roles(player["name"], player["role"], player["lane"])
+
     return print("Done with changing mmr") 
     
 
